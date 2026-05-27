@@ -102,7 +102,7 @@ The HTML-output direction borrows directly from Thariq Shihipar's [`html-effecti
 
 ## License
 
-TBD — pending decision between Apache 2.0 (matches Thariq's upstream) and MIT.
+MIT — see [LICENSE](./LICENSE).
 
 ---
 
