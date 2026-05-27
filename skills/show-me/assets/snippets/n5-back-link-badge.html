@@ -1,0 +1,29 @@
+<!--
+N+5 — source-of-truth back-link 배지 (baseline, strict)
+
+각 인용 / 주장 / 발췌 옆에 1개씩.
+- href 의 경로는 프로젝트 루트 기준 상대 경로
+- Windows backslash 는 반드시 / 로 통일 (docs\foo.md → docs/foo.md)
+- heading slug 가 알면 #anchor 로 deep link, 모르면 file 만
+
+CSS 는 base.css 의 `.badge` 클래스 재사용.
+-->
+
+<!-- 기본 (heading anchor 있을 때) -->
+<a class="badge" href="{{ source path / 통일 }}#{{ heading slug }}" title="{{ source path }} 의 {{ heading }}">
+  ↗ {{ source filename or short title }}
+</a>
+
+<!-- heading anchor 없을 때 -->
+<a class="badge" href="{{ source path }}" title="{{ source path }}">
+  ↗ {{ source filename }}
+</a>
+
+<!-- 인라인 사용 예시 -->
+<!--
+  <p>
+    "토큰은 1시간 후 만료된다."
+    <a class="badge" href="docs/auth.md#토큰-만료-정책">↗ docs/auth.md</a>
+    이 정책은 너무 짧을 수 있다.
+  </p>
+-->

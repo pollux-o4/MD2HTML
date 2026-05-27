@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Calculator — Decision Impact Matrix</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, "Segoe UI", sans-serif; }
+  .cell-hit { background: #dbeafe; color: #1e40af; font-weight: 600; cursor: pointer; }
+  .cell-hit:hover { background: #93c5fd; }
+  .cell-miss { color: #cbd5e1; }
+  tr.row:hover { background: #f8fafc; }
+  tr.row.active { background: #eff6ff; }
+  .sidepanel { transition: transform .2s ease; }
+  .sidepanel.hidden { transform: translateX(100%); }
+  .badge-accepted { background: #dcfce7; color: #166534; }
+  .badge-proposed { background: #fef3c7; color: #92400e; }
+  .cell-sel { outline: 2px solid #2563eb; outline-offset: -2px; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<header class="bg-white border-b px-6 py-4 flex items-center justify-between">
+  <div>
+    <h1 class="text-xl font-semibold">Calculator — Decision Impact Matrix</h1>
+    <p class="text-sm text-slate-500">7 ADRs × 5 영역. 셀 클릭 = 선택, 행 클릭 = 상세.</p>
+  </div>
+  <div class="flex gap-2 items-center">
+    <label class="text-sm text-slate-600">컬럼 필터:</label>
+    <div id="colFilters" class="flex gap-1"></div>
+    <button id="copyBtn" class="ml-4 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-slate-300" disabled>
+      Copy as prompt (<span id="selCount">0</span>)
+    </button>
+  </div>
+</header>
+
+<main class="flex">
+  <section class="flex-1 p-6 overflow-auto">
+    <table class="w-full bg-white border border-slate-200 text-sm">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr>
+          <th class="text-left p-3 border-b w-12">#</th>
+          <th class="text-left p-3 border-b">Decision</th>
+          <th class="text-left p-3 border-b w-24">Status</th>
+          <th class="text-center p-3 border-b col-area" data-area="parser">parser</th>
+          <th class="text-center p-3 border-b col-area" data-area="evaluator">evaluator</th>
+          <th class="text-center p-3 border-b col-area" data-area="errors">errors</th>
+          <th class="text-center p-3 border-b col-area" data-area="types">types</th>
+          <th class="text-center p-3 border-b col-area" data-area="tests">tests</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+
+    <p class="text-xs text-slate-500 mt-3">
+      셀의 숫자 = 영향 받은 파일 개수. 회색 점 = 영향 없음.
+      Hover = 행 강조, 클릭 = 셀 선택 (copy-as-prompt 용), 행 더블클릭 = 상세 패널.
+    </p>
+  </section>
+
+  <aside id="sidepanel" class="sidepanel hidden fixed right-0 top-0 h-full w-[480px] bg-white border-l shadow-lg p-6 overflow-auto">
+    <button id="closeBtn" class="float-right text-slate-400 hover:text-slate-700">close</button>
+    <div id="panelBody"></div>
+  </aside>
+</main>
+
+<script>
+// ============================================================
+// 데이터 — LLM 이 10개 .md 를 종합해 만든 매트릭스
+// 각 ADR 의 "Affected Code" 섹션에서 파일 경로 → 영역으로 매핑
+// ============================================================
+const AREAS = ["parser", "evaluator", "errors", "types", "tests"];
+
+const decisions = [
+  {
+    id: "0001", title: "Decimal Precision", status: "Accepted",
+    impact: { parser: 1, evaluator: 1, errors: 0, types: 1, tests: 1 },
+    summary: "BigNumber wrapper 로 IEEE 754 회피. 모든 산술이 Decimal 위에서.",
+    files: {
+      parser: ["parser/tokenizer.ts"],
+      evaluator: ["evaluator/binary_op.ts"],
+      types: ["types/decimal.ts"],
+      tests: ["tests/decimal_precision.test.ts"]
+    }
+  },
+  {
+    id: "0002", title: "Operator Precedence", status: "Accepted",
+    impact: { parser: 2, evaluator: 0, errors: 0, types: 1, tests: 1 },
+    summary: "Precedence climbing. PEMDAS + `^` right-associative.",
+    files: {
+      parser: ["parser/precedence.ts", "parser/recursive_descent.ts"],
+      types: ["types/ast.ts"],
+      tests: ["tests/precedence.test.ts"]
+    }
+  },
+  {
+    id: "0003", title: "Zero Division", status: "Accepted",
+    impact: { parser: 0, evaluator: 1, errors: 2, types: 0, tests: 1 },
+    summary: "x/0 → DivisionByZero throw + RecoveryHint.",
+    files: {
+      evaluator: ["evaluator/binary_op.ts"],
+      errors: ["errors/division_by_zero.ts", "errors/recovery.ts"],
+      tests: ["tests/zero_division.test.ts"]
+    }
+  },
+  {
+    id: "0004", title: "Overflow", status: "Accepted",
+    impact: { parser: 0, evaluator: 1, errors: 1, types: 1, tests: 1 },
+    summary: "최대 10000 자릿수 cap. pow 는 사전 차단.",
+    files: {
+      evaluator: ["evaluator/decimal_ops.ts"],
+      errors: ["errors/overflow.ts"],
+      types: ["types/decimal.ts"],
+      tests: ["tests/overflow.test.ts"]
+    }
+  },
+  {
+    id: "0005", title: "Input Validation", status: "Accepted",
+    impact: { parser: 1, evaluator: 0, errors: 2, types: 0, tests: 1 },
+    summary: "parser 앞단 whitelist 검증. 길이, 문자, BOM 처리.",
+    files: {
+      parser: ["parser/validator.ts"],
+      errors: ["errors/invalid_input.ts", "errors/recovery.ts"],
+      tests: ["tests/input_validation.test.ts"]
+    }
+  },
+  {
+    id: "0006", title: "Parser Strategy", status: "Accepted",
+    impact: { parser: 3, evaluator: 0, errors: 0, types: 0, tests: 1 },
+    summary: "Recursive descent + precedence climbing, 외부 의존성 0.",
+    files: {
+      parser: ["parser/recursive_descent.ts", "parser/tokenizer.ts", "parser/precedence.ts"],
+      tests: ["tests/parser.test.ts"]
+    }
+  },
+  {
+    id: "0007", title: "Error Recovery", status: "Proposed",
+    impact: { parser: 2, evaluator: 1, errors: 1, types: 0, tests: 1 },
+    summary: "partial AST + RecoveryHint. 진행 중 (handoff 참조).",
+    files: {
+      parser: ["parser/recursive_descent.ts", "parser/validator.ts"],
+      evaluator: ["evaluator/partial_eval.ts"],
+      errors: ["errors/recovery.ts"],
+      tests: ["tests/recovery.test.ts"]
+    }
+  }
+];
+
+// ============================================================
+// 렌더링
+// ============================================================
+const visibleAreas = new Set(AREAS);
+const selected = new Set();  // "0001:parser" 형태
+
+function renderColFilters() {
+  const root = document.getElementById("colFilters");
+  root.innerHTML = AREAS.map(a => `
+    <button data-area="${a}"
+      class="filter-btn px-2 py-1 text-xs rounded border ${visibleAreas.has(a) ? "bg-blue-50 border-blue-300 text-blue-700" : "bg-white border-slate-300 text-slate-400"}">
+      ${a}
+    </button>
+  `).join("");
+  root.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.onclick = () => {
+      const a = btn.dataset.area;
+      visibleAreas.has(a) ? visibleAreas.delete(a) : visibleAreas.add(a);
+      // 숨겨진 영역의 선택은 해제
+      [...selected].forEach(k => { if (!visibleAreas.has(k.split(":")[1])) selected.delete(k); });
+      render();
+    };
+  });
+}
+
+function renderTable() {
+  document.querySelectorAll(".col-area").forEach(th => {
+    th.style.display = visibleAreas.has(th.dataset.area) ? "" : "none";
+  });
+
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = decisions.map(d => `
+    <tr class="row border-b" data-id="${d.id}">
+      <td class="p-3 text-slate-400 font-mono text-xs">${d.id}</td>
+      <td class="p-3 font-medium">${d.title}</td>
+      <td class="p-3"><span class="px-2 py-0.5 rounded text-xs badge-${d.status.toLowerCase()}">${d.status}</span></td>
+      ${AREAS.map(a => {
+        if (!visibleAreas.has(a)) return "";
+        const n = d.impact[a];
+        const key = `${d.id}:${a}`;
+        const sel = selected.has(key) ? " cell-sel" : "";
+        return n > 0
+          ? `<td class="p-3 text-center cell cell-hit${sel}" data-key="${key}">${n}</td>`
+          : `<td class="p-3 text-center cell-miss">·</td>`;
+      }).join("")}
+    </tr>
+  `).join("");
+
+  tbody.querySelectorAll("tr.row").forEach(tr => {
+    tr.ondblclick = () => openPanel(tr.dataset.id);
+  });
+  tbody.querySelectorAll(".cell-hit").forEach(td => {
+    td.onclick = (e) => {
+      e.stopPropagation();
+      const key = td.dataset.key;
+      selected.has(key) ? selected.delete(key) : selected.add(key);
+      render();
+    };
+  });
+}
+
+function renderCopyBtn() {
+  const btn = document.getElementById("copyBtn");
+  document.getElementById("selCount").textContent = selected.size;
+  btn.disabled = selected.size === 0;
+}
+
+function render() { renderColFilters(); renderTable(); renderCopyBtn(); }
+
+// ============================================================
+// Sidepanel
+// ============================================================
+function openPanel(id) {
+  const d = decisions.find(x => x.id === id);
+  if (!d) return;
+  document.querySelectorAll("tr.row").forEach(tr => tr.classList.toggle("active", tr.dataset.id === id));
+  document.getElementById("panelBody").innerHTML = `
+    <h2 class="text-lg font-semibold mb-1">ADR ${d.id} — ${d.title}</h2>
+    <span class="px-2 py-0.5 rounded text-xs badge-${d.status.toLowerCase()}">${d.status}</span>
+    <p class="text-sm text-slate-600 mt-3">${d.summary}</p>
+    <h3 class="font-semibold mt-5 mb-2 text-sm">Affected Code</h3>
+    ${AREAS.map(a => d.files[a] ? `
+      <div class="mb-3">
+        <div class="text-xs uppercase text-slate-500 mb-1">${a}</div>
+        <ul class="text-sm font-mono text-slate-700 space-y-0.5">
+          ${d.files[a].map(f => `<li class="pl-2">${f}</li>`).join("")}
+        </ul>
+      </div>` : ""
+    ).join("")}
+  `;
+  document.getElementById("sidepanel").classList.remove("hidden");
+}
+document.getElementById("closeBtn").onclick = () => {
+  document.getElementById("sidepanel").classList.add("hidden");
+  document.querySelectorAll("tr.row").forEach(tr => tr.classList.remove("active"));
+};
+
+// ============================================================
+// Copy as prompt
+// ============================================================
+document.getElementById("copyBtn").onclick = async () => {
+  const lines = ["선택된 결정 × 영역:", ""];
+  const byDecision = {};
+  selected.forEach(key => {
+    const [id, area] = key.split(":");
+    (byDecision[id] ||= []).push(area);
+  });
+  Object.entries(byDecision).forEach(([id, areas]) => {
+    const d = decisions.find(x => x.id === id);
+    lines.push(`## ADR ${id} — ${d.title} (${d.status})`);
+    lines.push(d.summary);
+    areas.forEach(a => {
+      lines.push(`- ${a}: ${d.files[a].join(", ")}`);
+    });
+    lines.push("");
+  });
+  const text = lines.join("\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    const btn = document.getElementById("copyBtn");
+    const orig = btn.innerHTML;
+    btn.innerHTML = "Copied!";
+    setTimeout(() => btn.innerHTML = orig, 1200);
+  } catch {
+    alert(text);
+  }
+};
+
+render();
+</script>
+</body>
+</html>

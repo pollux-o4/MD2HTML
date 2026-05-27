@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>md-show-me · Prototype B2 Case B — Dirty Repo Discovery</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">md-show-me</span>
+        <span class="brand-sub">Prototype B2 · Case B — Dirty Repo Discovery</span>
+      </div>
+      <div class="query-box">
+        <span class="q-label">쿼리</span>
+        <span class="q-val">"리뷰"</span>
+        <span class="q-meta" id="qMeta">— 138개 .md 중 찾는 중...</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1) Agent loop trace (접힘) -->
+    <section class="card-block">
+      <details id="traceBlock">
+        <summary>
+          <span class="sum-title">Agent loop trace</span>
+          <span class="sum-hint" id="traceHint">5단계 시뮬레이션 — 클릭해서 펼치기</span>
+        </summary>
+        <div class="trace-body" id="traceBody">
+          <!-- JS 가 채움 -->
+        </div>
+      </details>
+    </section>
+
+    <!-- 2) 점수 분포 + 컨트롤 -->
+    <section class="card-block dist-block">
+      <div class="dist-head">
+        <h2>점수 분포 <small>(embedding cosine — 후보 N개)</small></h2>
+        <div class="control-row">
+          <label class="slider-label">
+            cut-off
+            <input type="range" id="cutoff" min="0" max="1" step="0.01" value="0.40" />
+            <span id="cutoffVal" class="cutoff-val">0.40</span>
+          </label>
+          <button id="moreBtn" class="btn-secondary">더 탐색해줘</button>
+        </div>
+      </div>
+
+      <div class="dist-wrap">
+        <div id="distChart" class="dist-chart"></div>
+        <div class="dist-axis">
+          <span>0.0</span><span>0.25</span><span>0.5</span><span>0.75</span><span>1.0</span>
+        </div>
+      </div>
+
+      <p class="hint">
+        <b>hard cut 아님.</b> 슬라이더를 움직여서 직접 조정. 점선이 현재 cut-off,
+        그 위 후보가 카드로 노출. agent 가 임의로 top-N 자르지 않는다.
+      </p>
+    </section>
+
+    <!-- 3) 카드 리스트 -->
+    <section class="card-block">
+      <div class="list-head">
+        <h2>큐레이션 결과 <small id="listCount"></small></h2>
+        <span class="parent-ctx" title="sub-agent 가 본문 raw 를 main 에 넣지 않음">
+          parent context delta: <span id="ctxDelta">0</span> tokens
+        </span>
+      </div>
+      <div id="cardList" class="card-list">
+        <!-- JS 가 채움 -->
+      </div>
+    </section>
+  </main>
+
+  <!-- toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="mock-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

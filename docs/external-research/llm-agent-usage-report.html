@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LLM Agent 실사용 리서치 보고서</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #19212a;
+      --muted: #5d6876;
+      --line: #d8dee8;
+      --panel: #f6f8fb;
+      --panel-strong: #edf2f8;
+      --accent: #0f6b63;
+      --accent-2: #8b3f1f;
+      --warn: #9a5b00;
+      --ok: #17633a;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.62;
+      color: var(--ink);
+      background: #f9fafc;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 52px 0 34px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 0.86rem;
+      font-weight: 750;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 900px;
+      font-size: clamp(2.1rem, 4vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 840px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      color: #374151;
+      font-size: 0.9rem;
+      font-weight: 650;
+    }
+
+    main {
+      padding: 30px 0 72px;
+    }
+
+    section {
+      margin-top: 34px;
+      padding-top: 4px;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 1.58rem;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 1.08rem;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    .lead-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .card strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 1.02rem;
+    }
+
+    .callout {
+      padding: 16px 18px;
+      border: 1px solid #bfd6d1;
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      background: #f3faf8;
+    }
+
+    .warning {
+      border-color: #e3cfac;
+      border-left-color: var(--warn);
+      background: #fff8ea;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .pattern-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .pattern-list li {
+      min-height: 116px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--white);
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 7px;
+      color: var(--accent-2);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      vertical-align: top;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    th {
+      background: var(--panel-strong);
+      color: #263241;
+      font-size: 0.9rem;
+      line-height: 1.35;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .source-note {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .tag {
+      display: inline-block;
+      margin: 0 5px 5px 0;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #e9f3f1;
+      color: #0d5a53;
+      font-size: 0.78rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .tag.warn {
+      background: #fff0d3;
+      color: #744500;
+    }
+
+    .source-list {
+      columns: 2;
+      column-gap: 30px;
+      margin: 12px 0 0;
+      padding-left: 20px;
+    }
+
+    .source-list li {
+      break-inside: avoid;
+      margin-bottom: 8px;
+    }
+
+    .compact {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 860px) {
+      .lead-grid,
+      .grid-2,
+      .pattern-list {
+        grid-template-columns: 1fr;
+      }
+
+      .source-list {
+        columns: 1;
+      }
+
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        border-bottom: 1px solid var(--line);
+      }
+
+      td {
+        border-bottom: 0;
+        padding: 10px 14px;
+      }
+
+      td::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 3px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap hero">
+      <p class="eyebrow">External Research</p>
+      <h1>LLM Agent를 실제로 잘 쓰는 사람들은 무엇을 다르게 하나</h1>
+      <p class="subtitle">
+        Reddit 사용자 사례, Andrej Karpathy의 공개 발언, Simon Willison·Ethan Mollick·Armin Ronacher 등 실무자 글을 종합한 HTML 보고서입니다.
+        목적은 “에이전트에게 큰 일을 던지는 법”이 아니라 “작업 범위를 좁혀 실제 결과 품질을 올리는 법”을 정리하는 것입니다.
+      </p>
+      <div class="meta">
+        <span class="pill">작성일: 2026-05-18</span>
+        <span class="pill">범위: 2024-2026 공개 자료</span>
+        <span class="pill">검증: 별도 fact-check 에이전트 검토 반영</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>핵심 결론</h2>
+      <div class="lead-grid">
+        <div class="card">
+          <strong>1. 자율성보다 검증 루프가 핵심이다</strong>
+          <p class="compact">잘 쓰는 사람들은 에이전트에게 “끝까지 알아서”보다 “계획, 작은 구현, 테스트, 리뷰, 승인” 흐름을 강제한다.</p>
+        </div>
+        <div class="card">
+          <strong>2. 좋은 작업은 작고 측정 가능하다</strong>
+          <p class="compact">성공 기준이 테스트, diff, benchmark, 재현 결과처럼 확인 가능할수록 에이전트 성과가 좋아진다.</p>
+        </div>
+        <div class="card">
+          <strong>3. 감독자는 코드를 덜 치는 대신 기준을 더 잘 세운다</strong>
+          <p class="compact">스펙, 컨텍스트, 권한 경계, 품질 기준, 실패 시 중단 조건을 설계하는 일이 더 중요해진다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>검증 기준</h2>
+      <div class="grid-2">
+        <div class="callout">
+          <h3>이 보고서에서 강하게 말할 수 있는 것</h3>
+          <p class="compact">
+            공개 글과 토론에서 반복적으로 확인되는 패턴은 “작은 범위”, “명확한 성공 기준”, “테스트/리뷰/검증 에이전트”, “사람의 최종 승인”입니다.
+            Karpathy, Willison, Ronacher 같은 실무자는 특히 코딩 에이전트를 이런 방식으로 제한하거나 조율합니다.
+          </p>
+        </div>
+        <div class="callout warning">
+          <h3>강하게 말하면 안 되는 것</h3>
+          <p class="compact">
+            Reddit은 자기보고 사례이고, Anthropic/OpenAI/Cognition 사례는 회사 발표입니다.
+            따라서 생산성 수치나 “대부분의 시장이 이렇게 쓴다”는 정량 주장으로 확장하지 않았습니다.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>반복적으로 확인된 사용 패턴</h2>
+      <ul class="pattern-list">
+        <li>
+          <span class="label">Pattern 01</span>
+          <h3>코딩 에이전트는 작은 수직 슬라이스에 강하다</h3>
+          <p class="compact">기능 전체보다 “이 파일을 읽고 이 테스트를 통과시키는 작은 변경”이 안정적이다. 구현 전 계획을 요구하고, 구현 후 테스트와 diff 리뷰를 붙인다.</p>
+        </li>
+        <li>
+          <span class="label">Pattern 02</span>
+          <h3>서브에이전트는 역할 분리용이다</h3>
+          <p class="compact">planner, researcher, implementer, reviewer, verifier를 분리해 컨텍스트를 좁힌다. 단, 너무 많이 나누면 조율 비용과 대기 시간이 늘어난다.</p>
+        </li>
+        <li>
+          <span class="label">Pattern 03</span>
+          <h3>리뷰 전용 에이전트가 품질을 올린다</h3>
+          <p class="compact">작성 에이전트와 검증 에이전트를 분리하면 “주장한 완료 상태”와 “실제 diff/test 결과”의 불일치를 잡기 쉽다.</p>
+        </li>
+        <li>
+          <span class="label">Pattern 04</span>
+          <h3>리서치 에이전트는 산출물 형식이 있을 때 낫다</h3>
+          <p class="compact">단순 요약보다 “출처 표, 주장 강도, 반례, 의사결정 권고”처럼 결과 형식을 지정할수록 재사용 가능한 결과가 나온다.</p>
+        </li>
+        <li>
+          <span class="label">Pattern 05</span>
+          <h3>브라우저/업무 자동화는 긴 작업에서 가치가 커진다</h3>
+          <p class="compact">경쟁사 조사, 데이터 정리, 웹 크롤링, 반복 입력처럼 오래 걸리는 작업에 적합하다. 짧고 민감한 작업은 지연, 로그인, 권한 문제가 비용을 키운다.</p>
+        </li>
+        <li>
+          <span class="label">Pattern 06</span>
+          <h3>컨텍스트 파일은 에이전트용 작업 계약서다</h3>
+          <p class="compact">명령어, 금지 행동, 테스트 방법, 도메인 용어, 실패 시 중단 조건을 문서화하면 에이전트가 덜 헤맨다.</p>
+        </li>
+        <li>
+          <span class="label">Pattern 07</span>
+          <h3>자동 평가 루프가 있으면 장시간 작업이 가능하다</h3>
+          <p class="compact">수정, 실행, 측정, 유지/폐기 루프가 있으면 에이전트가 밤새 실험하거나 리팩터링해도 결과를 판정할 수 있다.</p>
+        </li>
+        <li>
+          <span class="label">Pattern 08</span>
+          <h3>권한은 단계적으로 열어야 한다</h3>
+          <p class="compact">읽기, 계획, 제한된 수정, 테스트 실행, 외부 작업 순으로 올린다. 배포, 결제, 이메일 발송, 데이터 삭제는 기본적으로 승인 게이트를 둔다.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>주요 인물과 조직별 관찰</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>출처</th>
+            <th>확인된 사용 방식</th>
+            <th>한계와 주의점</th>
+            <th>신뢰도 처리</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="출처">Andrej Karpathy</td>
+            <td data-label="확인된 사용 방식">
+              Software 3.0, autonomy slider, human-in-the-loop 관점을 제시했다.
+              Claude/Codex 같은 에이전트를 매일 쓰지만, nanochat처럼 정밀한 구조가 필요한 작업에서는 항상 유용하지 않았다고 설명했다.
+              Rust tokenizer, 빠른 앱 데모, autoresearch처럼 측정 루프가 있는 작업에서 에이전트 활용을 공개했다.
+            </td>
+            <td data-label="한계와 주의점">
+              vibe coding은 프로토타입에는 유용하지만 프로덕션 품질, 보안, 추상화 설계에는 인간의 이해와 검증이 필요하다는 쪽에 가깝다.
+              “agentic engineering”은 유용한 구분이지만 업계 표준 용어로 확정됐다고 보기는 어렵다.
+            </td>
+            <td data-label="신뢰도 처리"><span class="tag">1차/전사</span><span class="tag warn">일부 전사 미러</span></td>
+          </tr>
+          <tr>
+            <td data-label="출처">Reddit 실사용 토론</td>
+            <td data-label="확인된 사용 방식">
+              코딩, 서브에이전트 역할 분리, 브라우저 리서치, CSV/스크립트 작업, Slack/Notion/Jira 맥락 요약, 검증 에이전트 활용 사례가 반복된다.
+            </td>
+            <td data-label="한계와 주의점">
+              표본 대표성은 없다. 자기보고, 홍보성 댓글, 환경 차이, 삭제/수정 가능성을 전제로 읽어야 한다.
+            </td>
+            <td data-label="신뢰도 처리"><span class="tag warn">일화적 근거</span></td>
+          </tr>
+          <tr>
+            <td data-label="출처">Simon Willison</td>
+            <td data-label="확인된 사용 방식">
+              agentic loop를 “목표 달성까지 도구를 반복 실행하는 구조”로 설명하고, 여러 코딩 에이전트를 병렬로 돌리는 워크플로를 공개했다.
+              테스트와 리뷰가 있어야 병렬 코딩 에이전트가 실용적이라는 관점이 강하다.
+            </td>
+            <td data-label="한계와 주의점">
+              승인 프롬프트를 줄이면 속도는 올라가지만 프롬프트 인젝션, 소스 유출, 리뷰 병목 위험이 커진다고 본다.
+            </td>
+            <td data-label="신뢰도 처리"><span class="tag">개인 실무 글</span></td>
+          </tr>
+          <tr>
+            <td data-label="출처">Ethan Mollick</td>
+            <td data-label="확인된 사용 방식">
+              Claude Sonnet 4.5로 경제학 논문과 복제 데이터를 읽고, STATA에서 Python으로 옮겨 재현을 시도하게 한 사례를 공개했다.
+              다른 모델로 재검산하는 방식도 사용했다.
+            </td>
+            <td data-label="한계와 주의점">
+              자체 실험과 spot check 성격이다. “학술 재현을 해결한다”가 아니라 “특정 조건에서 재현 업무 일부를 수행했다”로 읽어야 한다.
+            </td>
+            <td data-label="신뢰도 처리"><span class="tag">개인 실험</span><span class="tag warn">일반화 제한</span></td>
+          </tr>
+          <tr>
+            <td data-label="출처">Armin Ronacher</td>
+            <td data-label="확인된 사용 방식">
+              Claude Code를 중심으로 에이전트에게 작업을 맡기고, 완료 후 사람이 검토하는 흐름을 설명했다.
+              MCP와 브라우저 조작은 필요할 때만 쓰고, 격리 환경을 강조했다.
+            </td>
+            <td data-label="한계와 주의점">
+              권한 체크 비활성화는 위험하므로 Docker 같은 격리가 필요하다. MCP는 능력을 늘리지만 실패 지점도 늘린다.
+            </td>
+            <td data-label="신뢰도 처리"><span class="tag">개인 실무 글</span></td>
+          </tr>
+          <tr>
+            <td data-label="출처">Andrew Ng / DeepLearning.AI</td>
+            <td data-label="확인된 사용 방식">
+              Reflection, Tool use, Planning, Multi-agent collaboration을 핵심 패턴으로 정리하고, evals와 error analysis 없이는 성능 한계에 부딪힌다고 강조한다.
+            </td>
+            <td data-label="한계와 주의점">
+              개인의 일상 사용기라기보다 교육/컨설팅 경험에서 나온 설계 지침으로 분류하는 것이 정확하다.
+            </td>
+            <td data-label="신뢰도 처리"><span class="tag">교육 자료</span></td>
+          </tr>
+          <tr>
+            <td data-label="출처">Anthropic / OpenAI / Cognition</td>
+            <td data-label="확인된 사용 방식">
+              코드베이스 탐색, 테스트 작성, PR 리뷰, 버그 triage, 성능 개선, 데이터 분석, 장기 실행 계획, watchdog/verifier 에이전트 같은 사용을 발표했다.
+            </td>
+            <td data-label="한계와 주의점">
+              생산성 수치와 내부 사례는 자사 발표다. 독립 검증 자료가 아니므로 “보고했다” 또는 “회사 발표 기준”으로 표현해야 한다.
+            </td>
+            <td data-label="신뢰도 처리"><span class="tag warn">회사 발표</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>작업을 더 잘 맡기기 위한 실전 지침</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>좋은 요청 형태</h3>
+          <p>“이 기능 만들어줘” 대신 아래처럼 좁힌다.</p>
+          <p class="compact">
+            이 파일들과 테스트만 읽어라. 변경 범위를 먼저 제안하라. 승인 전 구현하지 마라.
+            구현 후에는 실행한 명령, 실패한 명령, 남은 위험을 보고하라. 별도 검증 에이전트가 확인할 수 있게 증거를 남겨라.
+          </p>
+        </div>
+        <div class="card">
+          <h3>작업 단위 분해</h3>
+          <p class="compact">
+            researcher는 출처와 반례를 모으고, planner는 범위와 성공 기준을 만든다.
+            worker는 지정된 파일만 수정하고, verifier는 diff/test/source를 따로 검증한다.
+            supervisor는 에이전트 사이 결과를 통합하고 최종 판단을 내린다.
+          </p>
+        </div>
+        <div class="card">
+          <h3>검증 체크리스트</h3>
+          <p class="compact">
+            테스트가 있는가. 실패를 숨기지 않았는가. 출처가 실제로 주장을 뒷받침하는가.
+            회사 발표와 독립 검증을 구분했는가. 권한이 작업 위험도에 비해 과하지 않은가.
+          </p>
+        </div>
+        <div class="card">
+          <h3>중단 조건</h3>
+          <p class="compact">
+            같은 오류를 두 번 반복하면 멈춘다. 컨텍스트가 불명확하면 질문한다.
+            삭제, 결제, 배포, 외부 발송은 승인 없이 하지 않는다.
+            테스트 없는 대형 변경은 작은 슬라이스로 다시 쪼갠다.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>추천 워크플로</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>단계</th>
+            <th>에이전트 역할</th>
+            <th>감독자가 확인할 것</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="단계">1. Scope</td>
+            <td data-label="에이전트 역할">관련 파일, 자료, 출처를 찾고 작업을 작은 단위로 제안한다.</td>
+            <td data-label="감독자가 확인할 것">범위가 너무 넓지 않은지, 성공 기준이 관찰 가능한지 확인한다.</td>
+          </tr>
+          <tr>
+            <td data-label="단계">2. Plan</td>
+            <td data-label="에이전트 역할">변경 계획, 테스트 계획, 위험을 먼저 보고한다.</td>
+            <td data-label="감독자가 확인할 것">계획이 실제 코드베이스와 맞는지, 불필요한 리팩터가 섞였는지 본다.</td>
+          </tr>
+          <tr>
+            <td data-label="단계">3. Execute</td>
+            <td data-label="에이전트 역할">정해진 파일과 명령 안에서만 구현한다.</td>
+            <td data-label="감독자가 확인할 것">작업 경계, 권한, 실행 로그를 확인한다.</td>
+          </tr>
+          <tr>
+            <td data-label="단계">4. Verify</td>
+            <td data-label="에이전트 역할">다른 에이전트가 diff, 테스트, 출처, 주장 강도를 검토한다.</td>
+            <td data-label="감독자가 확인할 것">작성자와 검증자의 결론이 충돌하는 지점을 직접 본다.</td>
+          </tr>
+          <tr>
+            <td data-label="단계">5. Ship or Narrow</td>
+            <td data-label="에이전트 역할">남은 위험과 다음 작은 작업을 제안한다.</td>
+            <td data-label="감독자가 확인할 것">지금 합칠지, 더 쪼갤지, 중단할지 결정한다.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>출처</h2>
+      <p class="source-note">
+        아래 링크는 검증 에이전트가 존재 여부와 주장 적합성을 확인한 목록입니다.
+        Reddit은 일화적 자료, 회사 블로그는 자사 발표로 분리해서 해석했습니다.
+      </p>
+      <ul class="source-list">
+        <li><a href="https://www.reddit.com/r/productivity/comments/1ocu9ys/how_are_people_actually_using_ai_agents_for_real/">Reddit r/productivity: How are people actually using AI agents for real work?</a></li>
+        <li><a href="https://www.reddit.com/r/ClaudeAI/comments/1mdyc60/whats_your_best_way_to_use_subagents_in_claude/">Reddit r/ClaudeAI: Sub-agents in Claude Code</a></li>
+        <li><a href="https://www.reddit.com/r/ChatGPTPro/comments/1mjl541/agent_mode_a_week_in_is_it_worth_the_message_cap/">Reddit r/ChatGPTPro: Agent Mode a week in</a></li>
+        <li><a href="https://www.reddit.com/r/OpenAI/comments/1oum7uw/chatgpt_agent_is_a_joke/">Reddit r/OpenAI: ChatGPT Agent is a joke?</a></li>
+        <li><a href="https://www.reddit.com/r/AI_Agents/comments/1snagk0/how_are_you_actually_using_ai_agents_in_real/">Reddit r/AI_Agents: Real workflows right now</a></li>
+        <li><a href="https://www.reddit.com/r/ClaudeAI/comments/1rpd2pp/bringing_code_review_to_claude_code/">Reddit r/ClaudeAI: Bringing Code Review to Claude Code</a></li>
+        <li><a href="https://x.com/karpathy/status/1886192184808149383">Karpathy X post on vibe coding</a></li>
+        <li><a href="https://www.pcworld.com/article/2660539/i-started-vibe-coding-my-own-apps-with-ai-and-im-utterly-loving-it.html">PCWorld secondary reference on vibe coding</a></li>
+        <li><a href="https://www.youtube.com/watch?v=LCEmiRjPEtQ">Karpathy YC talk: Software Is Changing Again</a></li>
+        <li><a href="https://www.donnamagi.com/articles/karpathy-yc-talk">Karpathy YC talk transcript mirror</a></li>
+        <li><a href="https://www.dwarkesh.com/p/andrej-karpathy">Dwarkesh podcast with Andrej Karpathy</a></li>
+        <li><a href="https://karpathy.bearblog.dev/year-in-review-2025/">Karpathy: 2025 LLM Year in Review</a></li>
+        <li><a href="https://www.youtube.com/watch?v=96jN2OCOfLs">Karpathy Sequoia AI Ascent session video</a></li>
+        <li><a href="https://youtube-transcript.ai/docs/andrej-karpathy-from-vibe-coding-to-agentic-engineering-a5p36fz2jn">Karpathy Sequoia session transcript mirror</a></li>
+        <li><a href="https://github.com/karpathy/autoresearch">karpathy/autoresearch</a></li>
+        <li><a href="https://simonwillison.net/2025/Sep/30/designing-agentic-loops/">Simon Willison: Designing agentic loops</a></li>
+        <li><a href="https://simonwillison.net/2025/Oct/5/parallel-coding-agents/">Simon Willison: Parallel coding agents</a></li>
+        <li><a href="https://feeds.simonwillison.net/2025/Dec/25/claude-code-transcripts/">Simon Willison: Claude Code transcripts</a></li>
+        <li><a href="https://www.oneusefulthing.org/p/real-ai-agents-and-real-work">Ethan Mollick: Real AI Agents and Real Work</a></li>
+        <li><a href="https://www.deeplearning.ai/the-batch/check-out-our-course-on-how-to-build-ai-agents">DeepLearning.AI The Batch: Agentic AI course</a></li>
+        <li><a href="https://www.deeplearning.ai/courses/agentic-ai">DeepLearning.AI: Agentic AI course outline</a></li>
+        <li><a href="https://www.langchain.com/blog/deep-agents">LangChain: Deep Agents</a></li>
+        <li><a href="https://lucumr.pocoo.org/2025/6/12/agentic-coding/">Armin Ronacher: Agentic Coding Recommendations</a></li>
+        <li><a href="https://threadnavigator.com/thread/2007179832300581177/">Boris Cherny X thread mirror</a></li>
+        <li><a href="https://claude.com/blog/how-anthropic-teams-use-claude-code">Anthropic: How teams use Claude Code</a></li>
+        <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code best practices</a></li>
+        <li><a href="https://openai.com/index/introducing-codex/">OpenAI: Introducing Codex</a></li>
+        <li><a href="https://openai.com/index/codex-now-generally-available/">OpenAI: Codex generally available</a></li>
+        <li><a href="https://forum.openai.com/public/blogs/how-openai-engineers-use-codex-to-tackle-big-projects-with-rigor-2025-12-04">OpenAI Forum: engineers use Codex</a></li>
+        <li><a href="https://cognition.ai/blog/how-cognition-uses-devin-to-build-devin">Cognition: How Cognition uses Devin to build Devin</a></li>
+        <li><a href="https://cognition.ai/blog/introducing-devin-2-2">Cognition: Introducing Devin 2.2</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

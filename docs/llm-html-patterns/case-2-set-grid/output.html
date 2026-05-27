@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>계산기 프로젝트 ADR 0001~0005</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --card-hover: #232730;
+    --border: #2a2f3a;
+    --text: #e6e8eb;
+    --muted: #8b92a0;
+    --accent: #6ea8fe;
+    --accepted: #2d8f5f;
+    --proposed: #b58a2a;
+    --deprecated: #a94343;
+    --code-bg: #0a0c10;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    padding: 32px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  header h1 { margin: 0 0 8px; font-size: 22px; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .card:hover { background: var(--card-hover); border-color: var(--accent); }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .card-id {
+    font-family: ui-monospace, "Cascadia Code", monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .badge.accepted { background: var(--accepted); color: #fff; }
+  .badge.proposed { background: var(--proposed); color: #fff; }
+  .badge.deprecated { background: var(--deprecated); color: #fff; }
+  .card h2 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+  .card-summary {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-foot {
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    overflow-y: auto;
+    z-index: 100;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    max-width: 720px;
+    width: 100%;
+    padding: 24px;
+  }
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .modal h2 { margin: 0; font-size: 18px; }
+  .modal-section { margin-bottom: 16px; }
+  .modal-section h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin: 0 0 6px;
+  }
+  .modal-section p { margin: 0; font-size: 14px; }
+  .file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-family: ui-monospace, "Cascadia Code", monospace;
+    font-size: 12px;
+  }
+  .file-list li {
+    padding: 4px 8px;
+    background: var(--code-bg);
+    border-radius: 4px;
+    margin-bottom: 4px;
+    color: var(--accent);
+  }
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  button {
+    background: var(--accent);
+    color: #0a0c10;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  button.secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  button:hover { opacity: 0.9; }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accepted);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 200;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <h1>계산기 프로젝트 — ADR 0001~0005</h1>
+  <p>각 카드를 클릭하면 상세, "Copy as prompt" 로 다음 LLM 에 보낼 컨텍스트 복사</p>
+</header>
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" id="modal"></div>
+</div>
+
+<div class="toast" id="toast">Prompt 가 클립보드에 복사됐습니다</div>
+
+<script>
+const ADRS = [
+  {
+    id: "0001",
+    title: "소수점 정밀도 — Round Half Even",
+    status: "Accepted",
+    date: "2026-02-14",
+    decision: "내부 누적과 표시 모두 소수점 5자리, banker's rounding (round half to even) 로 통일한다.",
+    context: "부동소수점 누적 오차 노출 (0.1+0.2 문제) 로 결합법칙이 사용자 관찰 수준에서 깨졌다. BigDecimal 전면 도입은 과하지만, 표시/내부 정밀도 불일치는 디버깅을 어렵게 한다.",
+    consequences: "긍정: 결합법칙 성립, 회귀 테스트 작성 가능. 부정: 100회 이상 연쇄 시 누적 손실 가시화 가능.",
+    files: [
+      "src/engine/number.ts",
+      "src/engine/operators.ts",
+      "src/ui/display.ts",
+      "tests/engine/precision.spec.ts"
+    ]
+  },
+  {
+    id: "0002",
+    title: "연산자 우선순위 — PEMDAS 표준",
+    status: "Accepted",
+    date: "2026-02-21",
+    decision: "PEMDAS 표준을 모든 모드에서 항상 적용. Shunting-Yard 로 RPN 변환 후 스택 평가.",
+    context: "베타 테스터 23명 중 19명이 공학용 계산기 기본 요청. 좌→우 평가 (2+3*4=20) 는 즉시 버그로 인식됨. 모드 토글은 사용성 이슈 큼.",
+    consequences: "긍정: 학교/엔지니어링 onboarding 마찰 제거. 부정: 옛날 전자계산기 감성 사용자 혼란, 마이그레이션 가이드 필요.",
+    files: [
+      "src/parser/tokenizer.ts",
+      "src/parser/shunting-yard.ts",
+      "src/engine/evaluator.ts",
+      "tests/parser/precedence.spec.ts",
+      "docs/migration-from-simple-mode.md"
+    ]
+  },
+  {
+    id: "0003",
+    title: "0 나눗셈 — DivisionByZeroError 예외",
+    status: "Accepted",
+    date: "2026-03-02",
+    decision: "연산 시점에 DivisionByZeroError 예외 throw, 계산 파이프라인 즉시 중단. UI 가 한국어 메시지로 표시.",
+    context: "JS 기본 1/0 === Infinity 가 후속 연산을 오염시킴. 표시 레이어 패치는 누적 오염 막지 못함. 베타 피드백 최다 이슈 (12건).",
+    consequences: "긍정: 오염된 누적 제거, 어느 연산이 문제인지 즉시 파악. 부정: 중간 0 나눗셈도 전체 중단 — 부분 결과 요청 불만족.",
+    files: [
+      "src/engine/operators.ts",
+      "src/engine/errors.ts",
+      "src/ui/error-display.ts",
+      "tests/engine/zero-division.spec.ts",
+      "src/engine/evaluator.ts"
+    ]
+  },
+  {
+    id: "0004",
+    title: "오버플로우 처리 — i64 범위 검사",
+    status: "Accepted",
+    date: "2026-03-15",
+    decision: "모든 연산 결과를 i64 범위 검사 후 number 캐스트 전 검증. 초과 시 OverflowError throw.",
+    context: "BigInt 내부 연산 후 Number 캐스트가 2^53 초과 시 silent lossy. 회계 사용자에게 절대 불가. BigInt 끝까지 유지는 호환성 문제로 기각.",
+    consequences: "긍정: silent lossy 제거, 회계/재무 사용자 신뢰. 부정: i64 도 유한 — 과학 표기법은 ADR 0008 분리.",
+    files: [
+      "src/engine/number.ts",
+      "src/engine/operators.ts",
+      "src/engine/errors.ts",
+      "src/ui/error-display.ts",
+      "tests/engine/overflow.spec.ts"
+    ]
+  },
+  {
+    id: "0005",
+    title: "입력 검증 — 파서 단 일괄 처리",
+    status: "Accepted",
+    date: "2026-04-01",
+    decision: "검증을 파서 단 (Tokenizer + 신규 ValidationPass) 으로 일괄 이동. 후속 단계는 검증된 입력만 받는다는 전제로 검증 로직 제거.",
+    context: "ADR 0002 이후 검증 로직이 UI/Tokenizer/Shunting-Yard/Evaluator 4개 레이어에 산재. 에러 위치 추적 어렵고 회귀 테스트 작성 시 어느 레이어에 추가할지 논쟁.",
+    consequences: "긍정: 어디서 검증하나 논쟁 종결, 위치 정보 포함 에러 메시지. 부정: 짧은 입력에 over-engineering 처럼 보일 수 있음 (실측 < 1ms).",
+    files: [
+      "src/parser/validator.ts",
+      "src/parser/shunting-yard.ts",
+      "src/engine/evaluator.ts",
+      "src/ui/keypad.ts",
+      "src/ui/input-highlight.ts",
+      "tests/parser/validation.spec.ts"
+    ]
+  }
+];
+
+function renderGrid() {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = ADRS.map((a, i) => `
+    <div class="card" data-idx="${i}">
+      <div class="card-head">
+        <span class="card-id">ADR-${a.id}</span>
+        <span class="badge ${a.status.toLowerCase()}">${a.status}</span>
+      </div>
+      <h2>${a.title}</h2>
+      <p class="card-summary">${a.decision}</p>
+      <div class="card-foot">
+        <span>${a.date}</span>
+        <span>${a.files.length} files affected</span>
+      </div>
+    </div>
+  `).join("");
+  grid.querySelectorAll(".card").forEach(c => {
+    c.addEventListener("click", () => openModal(Number(c.dataset.idx)));
+  });
+}
+
+function openModal(idx) {
+  const a = ADRS[idx];
+  const modal = document.getElementById("modal");
+  modal.innerHTML = `
+    <div class="modal-head">
+      <div>
+        <div class="card-id">ADR-${a.id} · ${a.date}</div>
+        <h2>${a.title}</h2>
+      </div>
+      <span class="badge ${a.status.toLowerCase()}">${a.status}</span>
+    </div>
+    <div class="modal-section">
+      <h3>Context</h3>
+      <p>${a.context}</p>
+    </div>
+    <div class="modal-section">
+      <h3>Decision</h3>
+      <p>${a.decision}</p>
+    </div>
+    <div class="modal-section">
+      <h3>Consequences</h3>
+      <p>${a.consequences}</p>
+    </div>
+    <div class="modal-section">
+      <h3>Affected Code (${a.files.length})</h3>
+      <ul class="file-list">
+        ${a.files.map(f => `<li>${f}</li>`).join("")}
+      </ul>
+    </div>
+    <div class="btn-row">
+      <button onclick="copyPrompt(${idx})">Copy as prompt</button>
+      <button class="secondary" onclick="closeModal()">Close</button>
+    </div>
+  `;
+  document.getElementById("modal-backdrop").classList.add("open");
+}
+
+function closeModal() {
+  document.getElementById("modal-backdrop").classList.remove("open");
+}
+
+document.getElementById("modal-backdrop").addEventListener("click", (e) => {
+  if (e.target.id === "modal-backdrop") closeModal();
+});
+
+function copyPrompt(idx) {
+  const a = ADRS[idx];
+  const userComment = prompt("이 ADR 관련 추가 코멘트 (LLM 에 보낼 prompt 끝에 붙음):", "");
+  if (userComment === null) return;
+  const text = `# Context: ADR-${a.id}
+
+**${a.title}** (${a.status}, ${a.date})
+
+## Decision
+${a.decision}
+
+## Affected Code
+${a.files.map(f => `- ${f}`).join("\n")}
+
+## Consequences
+${a.consequences}
+
+---
+
+## User comment
+${userComment || "(없음)"}
+`;
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 1800);
+  });
+}
+
+renderGrid();
+</script>
+</body>
+</html>

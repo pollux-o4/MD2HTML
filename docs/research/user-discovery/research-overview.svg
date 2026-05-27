@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1400" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans KR', sans-serif">
+  <defs>
+    <style>
+      .title { font-size: 22px; font-weight: 700; fill: #1C1B1A; }
+      .subtitle { font-size: 13px; fill: #6B6A67; }
+      .domain { font-size: 14px; font-weight: 600; }
+      .doc { font-size: 11px; fill: #1C1B1A; }
+      .insight-num { font-size: 11px; font-weight: 700; fill: #FFFFFF; }
+      .insight-title { font-size: 13px; font-weight: 600; fill: #1C1B1A; }
+      .insight-body { font-size: 11px; fill: #3F3E3B; }
+      .verdict-pos { fill: #1A7F37; font-weight: 600; }
+      .verdict-neg { fill: #D1242F; font-weight: 600; }
+      .verdict-mid { fill: #9A6700; font-weight: 600; }
+    </style>
+  </defs>
+
+  <!-- Header -->
+  <text x="40" y="40" class="title">md-show-me — 조사 종합 (24 docs)</text>
+  <text x="40" y="62" class="subtitle">9 페르소나 + 9 학술 paper + 3 web empirical + 4 cross-review + 2 scoping/synthesis · 2026-05-27</text>
+
+  <!-- 4 source domains as swim lanes -->
+  <!-- Lane 1: Personas -->
+  <rect x="40" y="90" width="1020" height="120" rx="6" fill="#FDF6F2" stroke="#E5D5CC" />
+  <text x="56" y="112" class="domain" fill="#C96442">페르소나 (9명)</text>
+  <text x="56" y="130" class="doc">A 박지훈 (KR 백엔드 시니어, 34)  ·  B Maya (US 풀스택 주니어, 26)  ·  C 김민호 (KR tech lead, 42)</text>
+  <text x="56" y="146" class="doc">D 이지원 (KR 디자이너, 36)  ·  E 김도윤 (KR indie hacker 바이브코더, 29)</text>
+  <text x="56" y="162" class="doc">E2 정유나 (KR 디자이너→바이브코더, 31)  ·  E3 이수민 (KR 학생 바이브코더, 22)</text>
+  <text x="56" y="178" class="doc">F 박서연 (KR 마케터 비개발자, 33)  ·  G 박지수 (KR 인문계 학생, 23)</text>
+  <text x="56" y="196" class="doc" fill="#6B6A67">→ 모두 AI 사용자. v1 primary = Claude Code 환경 사용자 (개발자 + 바이브코더 spectrum)</text>
+
+  <!-- Lane 2: Academic papers -->
+  <rect x="40" y="220" width="1020" height="155" rx="6" fill="#F3F6FA" stroke="#D5DDE5" />
+  <text x="56" y="242" class="domain" fill="#0969DA">학술 paper (9 docs)</text>
+  <text x="56" y="260" class="doc">정보 밀도 (Tufte/Mayer/NN-g)  ·  시각 인지 + cross-domain (Cleveland-McGill/Cowan/Gestalt + 10 사이트)</text>
+  <text x="56" y="276" class="doc">인지-기억-활용 사슬 (Paivio/Sweller/Wittrock/Karpicke + Obsidian 진화 + Tarik 본질)</text>
+  <text x="56" y="292" class="doc">색·타이포 학술 (Piepenbrock 2013/Mehta-Zhu/Cochrane 2023)</text>
+  <text x="56" y="308" class="doc">행동경제 (Default effect/Choice overload/AI overreliance Buçinca 2021)</text>
+  <text x="56" y="324" class="doc">HCI (Fitts/Hick/Norman/Aesthetic-usability)</text>
+  <text x="56" y="340" class="doc">언어학·한국어 (code-switching cost ≈ 0/Coupé 39 bits-sec)</text>
+  <text x="56" y="356" class="doc">AI ethics·XAI (EU AI Act/AIS framework/Lee 2024)  ·  PKM 계보 (Memex/Engelbart/Luhmann)</text>
+
+  <!-- Lane 3: Web/empirical/discourse -->
+  <rect x="40" y="385" width="1020" height="92" rx="6" fill="#F4F8F4" stroke="#D5E0D7" />
+  <text x="56" y="407" class="domain" fill="#1A7F37">웹 empirical + 담론 (3 docs)</text>
+  <text x="56" y="425" class="doc">AI 글 피로 담론 (Simon Willison/HN slop/한국어 dev 담론 얕음)</text>
+  <text x="56" y="441" class="doc">정보 밀도 empirical (Perplexity 220 단어 + Wikipedia 717 단어 hybrid)</text>
+  <text x="56" y="457" class="doc">MD 도구 비교 (Notion/Obsidian/Perplexity/NotebookLM — 3조건 교집합 = unmet need)</text>
+
+  <!-- Lane 4: Cross-review + synthesis -->
+  <rect x="40" y="487" width="1020" height="92" rx="6" fill="#F8F5F8" stroke="#E0D5E0" />
+  <text x="56" y="509" class="domain" fill="#6B3FA0">Cross-review + Scoping (6 docs)</text>
+  <text x="56" y="527" class="doc">cross-review-personas  ·  cross-review-research  ·  bridge-pain-persona</text>
+  <text x="56" y="543" class="doc">persona-validity-review-9  ·  academic-gap-scoping</text>
+  <text x="56" y="559" class="doc">synthesis-final (이 문서들의 종합)</text>
+
+  <!-- Insights heading -->
+  <text x="40" y="620" class="title">핵심 통찰 10개</text>
+  <text x="40" y="640" class="subtitle">조사 결과에서 직접 도출된 design 결정 근거</text>
+
+  <!-- Insight cards 2-column grid -->
+  <!-- Card 1 -->
+  <g transform="translate(40,660)">
+    <rect width="500" height="100" rx="6" fill="#FFFFFF" stroke="#E5E5E3" />
+    <circle cx="22" cy="22" r="14" fill="#C96442"/>
+    <text x="22" y="26" text-anchor="middle" class="insight-num">1</text>
+    <text x="48" y="26" class="insight-title">Seed 가설 evidence-weighted 평가</text>
+    <text x="48" y="46" class="insight-body"><tspan class="verdict-pos">✅</tspan> "AI 글 지친다" 검증  ·  <tspan class="verdict-neg">❌</tspan> "YouTube/PPT 정보 밀도" 반박</text>
+    <text x="48" y="62" class="insight-body">→ 교체: Perplexity 220단어 + Wikipedia 717단어 hybrid</text>
+    <text x="48" y="78" class="insight-body"><tspan class="verdict-pos">✅</tspan> "정리된 거 보고 싶다" 4/4 도메인 검증</text>
+    <text x="48" y="94" class="insight-body"><tspan class="verdict-mid">⛔</tspan> "AI 냄새 자동 해결" out of scope</text>
+  </g>
+
+  <!-- Card 2 -->
+  <g transform="translate(560,660)">
+    <rect width="500" height="100" rx="6" fill="#FFFFFF" stroke="#E5E5E3" />
+    <circle cx="22" cy="22" r="14" fill="#0969DA"/>
+    <text x="22" y="26" text-anchor="middle" class="insight-num">2</text>
+    <text x="48" y="26" class="insight-title">인지-기억-활용 사슬 — MD 가 무너지는 지점</text>
+    <text x="48" y="46" class="insight-body">MD: 인지 ✓ → 기억 △ → 활용 ✗</text>
+    <text x="48" y="62" class="insight-body">Paivio dual coding 단일채널 위반 + Wittrock generation 부재</text>
+    <text x="48" y="78" class="insight-body">→ HTML 강점: dual coding (시각+언어) + copy-as-prompt = generation</text>
+    <text x="48" y="94" class="insight-body">학문 backing: Sweller/Karpicke (강) + Google Generative UI ELO 1736 (중)</text>
+  </g>
+
+  <!-- Card 3 -->
+  <g transform="translate(40,780)">
+    <rect width="500" height="100" rx="6" fill="#FFFFFF" stroke="#E5E5E3" />
+    <circle cx="22" cy="22" r="14" fill="#0969DA"/>
+    <text x="22" y="26" text-anchor="middle" class="insight-num">3</text>
+    <text x="48" y="26" class="insight-title">시각 인지 위계 (Cleveland-McGill 30년 재현)</text>
+    <text x="48" y="46" class="insight-body">Position 인코딩 압도 &gt; length &gt; angle &gt; area &gt; color saturation</text>
+    <text x="48" y="62" class="insight-body">Cowan 4±1 chunk (Miller 7±2 정련판) → 카드 3~5개 권장</text>
+    <text x="48" y="78" class="insight-body">F-pattern = 디자인 실패 증상 (NN-g 2017 update) → heading 으로 layer-cake 전환</text>
+    <text x="48" y="94" class="insight-body">색 = 2nd order signal (Tufte) — 본문 채도 X</text>
+  </g>
+
+  <!-- Card 4 -->
+  <g transform="translate(560,780)">
+    <rect width="500" height="100" rx="6" fill="#FFFFFF" stroke="#E5E5E3" />
+    <circle cx="22" cy="22" r="14" fill="#0969DA"/>
+    <text x="22" y="26" text-anchor="middle" class="insight-num">4</text>
+    <text x="48" y="26" class="insight-title">Color/Typography evidence-backed 결정</text>
+    <text x="48" y="46" class="insight-body"><tspan class="verdict-pos">Light mode default</tspan> (Piepenbrock 2013 + Cochrane 2023 + Claude Design)</text>
+    <text x="48" y="62" class="insight-body">Blue accent — Mehta-Zhu 2009 approach/creative mode 정합</text>
+    <text x="48" y="78" class="insight-body">Pretendard 직접 RCT 없음 (부모 Inter+Source Han Sans 합리화)</text>
+    <text x="48" y="94" class="insight-body">line-height 1.7 (한/영 혼용), letter-spacing 한글 0</text>
+  </g>
+
+  <!-- Card 5 -->
+  <g transform="translate(40,900)">
+    <rect width="500" height="100" rx="6" fill="#FFFFFF" stroke="#E5E5E3" />
+    <circle cx="22" cy="22" r="14" fill="#0969DA"/>
+    <text x="22" y="26" text-anchor="middle" class="insight-num">5</text>
+    <text x="48" y="26" class="insight-title">행동경제 — Default effect 매우 강 (Jachimowicz 메타 d=0.68)</text>
+    <text x="48" y="46" class="insight-body">"베이스라인 3 / light / no CDN" 단순 초기값 아닌 *우리 입장 표명*</text>
+    <text x="48" y="62" class="insight-body">90%+ 사용자 default 유지 → 신중히 선택해야</text>
+    <text x="48" y="78" class="insight-body">Choice overload 통념 X (Scheibehenne 메타 효과 ≈ 0)</text>
+    <text x="48" y="94" class="insight-body">→ 3 → 7 → 15 adaptive 확장 권장</text>
+  </g>
+
+  <!-- Card 6 -->
+  <g transform="translate(560,900)">
+    <rect width="500" height="100" rx="6" fill="#FFFFFF" stroke="#E5E5E3" />
+    <circle cx="22" cy="22" r="14" fill="#0969DA"/>
+    <text x="22" y="26" text-anchor="middle" class="insight-num">6</text>
+    <text x="48" y="26" class="insight-title">AI overreliance — cognitive forcing function 필요</text>
+    <text x="48" y="46" class="insight-body">Buçinca 2021 CHI — 검증 가능성 ≠ 검증 행동</text>
+    <text x="48" y="62" class="insight-body">Lee 2024 (MS Research) — back-link 만으로 부족</text>
+    <text x="48" y="78" class="insight-body">→ citation 카드 inline 펼침 X, 클릭 마찰 필요</text>
+    <text x="48" y="94" class="insight-body">→ copy-as-prompt = 사용자가 verification 행위 유도</text>
+  </g>
+
+  <!-- Card 7 -->
+  <g transform="translate(40,1020)">
+    <rect width="500" height="100" rx="6" fill="#FFFFFF" stroke="#E5E5E3" />
+    <circle cx="22" cy="22" r="14" fill="#0969DA"/>
+    <text x="22" y="26" text-anchor="middle" class="insight-num">7</text>
+    <text x="48" y="26" class="insight-title">HCI — Fitts × Hick 곱 + Invisible affordance 리스크</text>
+    <text x="48" y="46" class="insight-body">[Copy]/[Save] 배지 위치 = 모바일 영구노출, 데스크탑 카드 내부</text>
+    <text x="48" y="62" class="insight-body">Norman invisible affordance = copy-as-prompt 발견율 최대 리스크</text>
+    <text x="48" y="78" class="insight-body">→ ghost button 이지만 *명시적으로 보이는* 위치</text>
+    <text x="48" y="94" class="insight-body">Aesthetic-usability polish — 기능 결함 은폐 부작용 주의</text>
+  </g>
+
+  <!-- Card 8 -->
+  <g transform="translate(560,1020)">
+    <rect width="500" height="100" rx="6" fill="#FFFFFF" stroke="#E5E5E3" />
+    <circle cx="22" cy="22" r="14" fill="#0969DA"/>
+    <text x="22" y="26" text-anchor="middle" class="insight-num">8</text>
+    <text x="48" y="26" class="insight-title">한국어 — code-switching cost ≈ 0 + 정보 밀도 영어 같음</text>
+    <text x="48" y="46" class="insight-body">Beatty-Martínez 2020 — dense code-switcher 인지비용 거의 없음</text>
+    <text x="48" y="62" class="insight-body">→ 한글 본문 + 영어 keyword inline 정당화</text>
+    <text x="48" y="78" class="insight-body">Coupé 2019 — 모든 언어 ~39 bits/sec, 한국어 글자 적어도 정보량 비슷</text>
+    <text x="48" y="94" class="insight-body">→ 컷오프 영어 기준이면 한국어 너무 빨리 truncate. 한국어 70%</text>
+  </g>
+
+  <!-- Card 9 -->
+  <g transform="translate(40,1140)">
+    <rect width="500" height="100" rx="6" fill="#FFFFFF" stroke="#E5E5E3" />
+    <circle cx="22" cy="22" r="14" fill="#6B3FA0"/>
+    <text x="22" y="26" text-anchor="middle" class="insight-num">9</text>
+    <text x="48" y="26" class="insight-title">v1 primary = Claude Code 환경 사용자 spectrum</text>
+    <text x="48" y="46" class="insight-body">개발자 (박지훈/김민호/Maya) + 바이브코더 (도윤/유나/수민)</text>
+    <text x="48" y="62" class="insight-body">"전통 dev vs 바이브코더" 대립 X — Claude Code 안에서 모두 vibe spectrum</text>
+    <text x="48" y="78" class="insight-body">v1.x adjacent = 디자이너 (지원/유나)</text>
+    <text x="48" y="94" class="insight-body">v2 expansion = 비개발자 (서연/지수) — claude.ai 누적 시점 도달 시</text>
+  </g>
+
+  <!-- Card 10 -->
+  <g transform="translate(560,1140)">
+    <rect width="500" height="100" rx="6" fill="#1A7F37"/>
+    <circle cx="22" cy="22" r="14" fill="#FFFFFF"/>
+    <text x="22" y="26" text-anchor="middle" class="insight-num" fill="#1A7F37">10</text>
+    <text x="48" y="26" class="insight-title" fill="#FFFFFF">차별화 = unmet need 3 조건 교집합</text>
+    <text x="48" y="46" class="insight-body" fill="#FFFFFF">① repo .md = source-of-truth 유지 (Notion/NotebookLM 못 함)</text>
+    <text x="48" y="62" class="insight-body" fill="#FFFFFF">② query 별 ad-hoc 큐레이션 (Obsidian/mdBook 영구구조 X)</text>
+    <text x="48" y="78" class="insight-body" fill="#FFFFFF">③ self-contained HTML artifact (Claude Code 휘발 + NotebookLM export X)</text>
+    <text x="48" y="94" class="insight-body" fill="#FFFFFF">가장 가까운 경쟁자 = Perplexity (source 가 웹이라 mismatch)</text>
+  </g>
+
+  <!-- Footer note -->
+  <text x="40" y="1290" class="subtitle">PKM 위치: consumption layer 의 query-driven re-discovery 도구. Bush trail 의 LLM 자동 버전. daily 도구 X (retention KPI 두지 말 것).</text>
+  <text x="40" y="1308" class="subtitle">framing 정정: "terminal/Bloomberg" aesthetic 거부 → 시각 풍부 HTML (Tarik 톤). 모노스페이스 = semantic 만 (code/path/identifier).</text>
+  <text x="40" y="1326" class="subtitle">증거 강도 가장 강함: Sweller CLT / Karpicke retrieval / Cleveland-McGill / Default effect / Piepenbrock light mode.</text>
+  <text x="40" y="1344" class="subtitle">증거 가장 약함: Tarik MD 0%/HTML 95% (도메인 한정) / Pretendard 직접 RCT / 한국 dev code-switching 직접 연구.</text>
+  <text x="40" y="1380" class="subtitle" fill="#C96442" font-weight="600">결정 받아야 할 것: ① v1 primary spectrum 확정 ② baseline 3 strict 유지 ③ Pretendard 로컬만 vs CDN opt-in ④ adaptive 3→7→15 chip 적용 시점</text>
+</svg>

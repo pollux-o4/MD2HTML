@@ -1,0 +1,3 @@
+- The Mythical Man-Month
+- Designing Data-Intensive Apps
+- Staff Engineer

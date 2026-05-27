@@ -1,0 +1,28 @@
+<!--
+N1 — citation 포함 답변 카드 (baseline, strict)
+
+매 출력 상단에 1개. 핵심 답 + 출처 인용을 함께 보여준다.
+LLM 이 {{ }} 자리를 채워서 사용. citation 갯수는 자유.
+-->
+
+<article class="card answer-card">
+  <h2 class="card-title">{{ 핵심 답을 한 문장으로 }}</h2>
+
+  <p>{{ 본문 (1~3 문단). 사용자 쿼리에 대한 핵심 답을 풀어쓰기 }}</p>
+
+  <div class="answer-citations">
+    <h3 style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin: 16px 0 8px;">출처</h3>
+    <ul style="margin: 0; padding-left: 20px; font-size: 13px;">
+      <li>
+        <strong>{{ 인용 1 의 source title }}</strong>
+        — "{{ 인용 1 의 직접 인용문 }}"
+        <a class="badge" href="{{ 인용 1 의 source path (/ 통일) }}#{{ heading slug }}">↗ source</a>
+      </li>
+      <li>
+        <strong>{{ 인용 2 의 source title }}</strong>
+        — "{{ 인용 2 의 직접 인용문 }}"
+        <a class="badge" href="{{ 인용 2 의 source path }}#{{ heading slug }}">↗ source</a>
+      </li>
+    </ul>
+  </div>
+</article>

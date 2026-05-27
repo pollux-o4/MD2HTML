@@ -1,0 +1,89 @@
+<!--
+N+4 — copy-as-prompt 오버레이 (baseline, strict)
+
+HTML 안 모든 인터랙티브 요소 옆에 [Copy] / [Save] 두 버튼.
+LLM 이 인터랙션마다 data-* attribute 로 prompt payload 채움.
+
+CSS 는 base.css 의 `.cap-overlay`, `.cap-btn`, `.toast` 재사용.
+
+저장 위치 = <repo>/.agent-output/show-me/_review/<slug>.md (slug 당 1파일 append)
+-->
+
+<!-- 인터랙션 요소 옆에 inline 배치 예시 -->
+<div class="some-interaction">
+  <!-- 실제 인터랙션 UI 여기 -->
+
+  <span class="cap-overlay"
+        data-source-path="{{ 관련 source path }}"
+        data-heading="{{ 관련 heading }}"
+        data-anchor-quote="{{ anchor quote, review 일 때만 }}"
+        data-payload-extra='{{ JSON: 추가 필드 (slider value 등) }}'>
+    <button class="cap-btn" onclick="capCopy(this.parentElement)">[Copy]</button>
+    <button class="cap-btn" onclick="capSave(this.parentElement)">[Save]</button>
+  </span>
+</div>
+
+<!-- 페이지 끝에 toast 컨테이너 + JS 1회만 포함 -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+  // copy-as-prompt — 모든 .cap-overlay 가 공유
+  function _buildPrompt(overlay) {
+    const sourcePath = overlay.dataset.sourcePath || '';
+    const heading = overlay.dataset.heading || '';
+    const anchor = overlay.dataset.anchorQuote || '';
+    const extra = overlay.dataset.payloadExtra ? JSON.parse(overlay.dataset.payloadExtra) : {};
+
+    const isReview = !!anchor;
+    const header = isReview ? '## Review comment' : '## Interaction snapshot';
+    const lines = [header, ''];
+    if (sourcePath) lines.push(`source_path: ${sourcePath}`);
+    if (heading) lines.push(`heading: ${heading}`);
+    if (anchor) lines.push(`anchor_quote: "${anchor}"`);
+    for (const [k, v] of Object.entries(extra)) {
+      lines.push(`${k}: ${typeof v === 'string' ? v : JSON.stringify(v)}`);
+    }
+    lines.push(`created: ${new Date().toISOString()}`);
+    return lines.join('\n');
+  }
+
+  function _toast(msg) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2400);
+  }
+
+  function capCopy(overlay) {
+    const text = _buildPrompt(overlay);
+    navigator.clipboard.writeText(text).then(
+      () => _toast('✅ 복사됨 (Copy)'),
+      () => {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy'); ta.remove();
+        _toast('✅ 복사됨 (fallback)');
+      }
+    );
+  }
+
+  function capSave(overlay) {
+    // 브라우저는 직접 disk write 불가 — agent-mediated save 패턴 사용.
+    // [Save] = SAVE_TO_REVIEW marker 가 붙은 텍스트를 클립보드에 복사.
+    // 사용자가 Claude 세션에 paste 하면 show-me skill 이 marker 인식 → _review/<slug>.md 에 atomic append.
+    //
+    // [Copy] vs [Save] 의도 차이:
+    //   [Copy] = 그냥 클립보드 (어디든 paste 용)
+    //   [Save] = 클립보드 + marker → Claude 세션에 paste → _review 누적 저장
+    const slug = (window.SHOW_ME_SLUG || 'default');
+    const body = _buildPrompt(overlay);
+    const marked = `<!-- SAVE_TO_REVIEW: ${slug} -->\n${body}\n<!-- END_SAVE -->`;
+    navigator.clipboard.writeText(marked).then(
+      () => _toast(`✅ Save 텍스트 복사 — Claude 세션에 paste 하면 _review/${slug}.md 에 누적`),
+      () => _toast('⚠️  복사 실패 (브라우저 권한)')
+    );
+  }
+</script>

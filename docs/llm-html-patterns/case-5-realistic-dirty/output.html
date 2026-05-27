@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Phoenix — 성능 개선 결정</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .pill { font-size: 11px; padding: 2px 8px; border-radius: 9999px; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<header class="bg-white border-b border-slate-200">
+  <div class="max-w-5xl mx-auto px-6 py-6">
+    <p class="text-xs uppercase tracking-wider text-slate-500">Phoenix Platform — 결정 요약</p>
+    <h1 class="text-2xl font-semibold mt-1">성능 개선 결정 (2025)</h1>
+    <p class="text-sm text-slate-600 mt-2 max-w-3xl">
+      Phoenix 는 하루 ~2M 주문을 처리하며 hot path P99 200ms SLA 를 가짐.
+      2025 년 한 해 동안 세 건의 성능 결정이 accepted &amp; rolled out.
+    </p>
+    <p class="text-xs text-slate-400 mt-3">
+      원천: <code>docs/adr/</code> (정형 ADR), 보조: <code>docs/handoff/</code> &amp; <code>scratch/perf-notes.md</code>.
+      <code>scratch/</code> · <code>experiments/</code> · <code>archive/</code> 는 비공식.
+    </p>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-6 py-8 space-y-8">
+
+<!-- Timeline -->
+<section class="bg-white rounded-lg border border-slate-200 p-5">
+  <h2 class="text-sm font-semibold text-slate-700 mb-3">타임라인</h2>
+  <ol class="relative border-l border-slate-200 ml-3 space-y-4">
+    <li class="ml-4">
+      <span class="absolute -left-1.5 w-3 h-3 bg-emerald-500 rounded-full"></span>
+      <p class="text-xs text-slate-500">2025-Q1</p>
+      <p class="text-sm"><a href="#adr-0008" class="text-emerald-700 font-medium hover:underline">ADR 0008 — Caching strategy for the hot path</a></p>
+    </li>
+    <li class="ml-4">
+      <span class="absolute -left-1.5 w-3 h-3 bg-emerald-500 rounded-full"></span>
+      <p class="text-xs text-slate-500">2025-Q2</p>
+      <p class="text-sm"><a href="#adr-0011" class="text-emerald-700 font-medium hover:underline">ADR 0011 — Lazy evaluation on cart pricing</a></p>
+    </li>
+    <li class="ml-4">
+      <span class="absolute -left-1.5 w-3 h-3 bg-emerald-500 rounded-full"></span>
+      <p class="text-xs text-slate-500">2025-Q3</p>
+      <p class="text-sm"><a href="#adr-0014" class="text-emerald-700 font-medium hover:underline">ADR 0014 — Index pass on the orders table</a></p>
+    </li>
+  </ol>
+</section>
+
+<!-- ADR cards -->
+<section class="space-y-5">
+
+  <!-- ADR 0008 -->
+  <article id="adr-0008" class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+    <header class="flex items-start justify-between gap-4 p-5 border-b border-slate-100">
+      <div>
+        <p class="text-xs text-slate-500">ADR 0008 · 2025-Q1</p>
+        <h3 class="text-lg font-semibold mt-0.5">Caching strategy for the hot path</h3>
+        <p class="text-sm text-slate-600 mt-1">Two-tier 캐시 (request-scoped memo + Redis cache-aside) 로 hot path P99 200ms SLA 회복.</p>
+      </div>
+      <div class="text-right shrink-0">
+        <span class="pill bg-emerald-50 text-emerald-700 border border-emerald-200">Accepted</span>
+        <p class="text-xs text-slate-500 mt-2">P99 -40% (load test)</p>
+        <p class="text-xs text-slate-400">handoff: Maya</p>
+      </div>
+    </header>
+
+    <div class="p-5 grid md:grid-cols-2 gap-4 text-sm">
+      <details class="bg-slate-50 rounded p-3" open>
+        <summary class="cursor-pointer font-medium text-slate-700">Context</summary>
+        <p class="mt-2 text-slate-600">Order placement hot path 가 200ms P99 SLA 침범. 프로파일링 결과 동일 SKU 의 catalog/pricing lookup 반복 (한 request 내 + 같은 user 의 연속 request) 이 60% 차지.</p>
+      </details>
+      <details class="bg-slate-50 rounded p-3" open>
+        <summary class="cursor-pointer font-medium text-slate-700">Decision</summary>
+        <ul class="mt-2 text-slate-600 list-disc pl-5 space-y-1">
+          <li>Request-scoped memoization (SKU 키)</li>
+          <li>Redis 공유 캐시 — catalog 30s TTL, price 5s TTL, cache-aside, write-invalidate</li>
+          <li>Negative caching 60s (missing SKU)</li>
+        </ul>
+      </details>
+      <details class="bg-slate-50 rounded p-3">
+        <summary class="cursor-pointer font-medium text-slate-700">Consequences</summary>
+        <ul class="mt-2 text-slate-600 list-disc pl-5 space-y-1">
+          <li>P99 ~40% 감소 (load test 검증)</li>
+          <li>Stale price 최대 5s — product 수용</li>
+          <li>Redis 장애가 hot path 저하 → circuit breaker 로 direct lookup fallback</li>
+        </ul>
+      </details>
+      <details class="bg-slate-50 rounded p-3">
+        <summary class="cursor-pointer font-medium text-slate-700">Alternatives (기각)</summary>
+        <ul class="mt-2 text-slate-600 list-disc pl-5 space-y-1">
+          <li>CDN-level cache — user-key 불가</li>
+          <li>Longer TTL — pricing freshness</li>
+          <li>In-process only — cross-request 도움 없음</li>
+        </ul>
+      </details>
+    </div>
+  </article>
+
+  <!-- ADR 0011 -->
+  <article id="adr-0011" class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+    <header class="flex items-start justify-between gap-4 p-5 border-b border-slate-100">
+      <div>
+        <p class="text-xs text-slate-500">ADR 0011 · 2025-Q2</p>
+        <h3 class="text-lg font-semibold mt-0.5">Lazy evaluation on cart pricing</h3>
+        <p class="text-sm text-slate-600 mt-1">Cart mutation 마다 전체 promo 재계산을 lazy 화. mutation 지연 ~180ms → ~30ms.</p>
+      </div>
+      <div class="text-right shrink-0">
+        <span class="pill bg-emerald-50 text-emerald-700 border border-emerald-200">Accepted</span>
+        <p class="text-xs text-slate-500 mt-2">mutation -83%</p>
+        <p class="text-xs text-slate-400">handoff: Joon</p>
+      </div>
+    </header>
+
+    <div class="p-5 grid md:grid-cols-2 gap-4 text-sm">
+      <details class="bg-slate-50 rounded p-3" open>
+        <summary class="cursor-pointer font-medium text-slate-700">Context</summary>
+        <p class="mt-2 text-slate-600">Cart 변경마다 20+ promo rule 을 eager 평가 → mutation 당 ~150ms CPU. UI 는 line subtotal 만 즉시 노출, full price 는 checkout 에서만 필요.</p>
+      </details>
+      <details class="bg-slate-50 rounded p-3" open>
+        <summary class="cursor-pointer font-medium text-slate-700">Decision</summary>
+        <ul class="mt-2 text-slate-600 list-disc pl-5 space-y-1">
+          <li>Mutation 은 <code>pricing_dirty</code> 플래그만 set</li>
+          <li>Full pricing 은 <code>GET /cart/summary</code> 에서 on-demand</li>
+          <li>Per-line subtotal 은 eager 유지</li>
+          <li>Cart version 키 memoization</li>
+        </ul>
+      </details>
+      <details class="bg-slate-50 rounded p-3">
+        <summary class="cursor-pointer font-medium text-slate-700">Consequences</summary>
+        <ul class="mt-2 text-slate-600 list-disc pl-5 space-y-1">
+          <li>Mutation P99 180ms → 30ms</li>
+          <li>Checkout view 지연은 동일 (비용 이동)</li>
+          <li>새 invariant: <code>cart.total</code> 은 <code>/summary</code> 응답일 때만 신뢰 (API spec 반영)</li>
+        </ul>
+      </details>
+      <details class="bg-slate-50 rounded p-3">
+        <summary class="cursor-pointer font-medium text-slate-700">Alternatives (기각)</summary>
+        <ul class="mt-2 text-slate-600 list-disc pl-5 space-y-1">
+          <li>Cart hash 키 캐시 — cart 가 계속 변해 hit rate 0 근접</li>
+          <li>Mutation 후 async 계산 — checkout race</li>
+          <li>(별도) Rust 재작성 spike — 3x microbench 이긴 했으나 비용 대비 lazy eval 채택</li>
+        </ul>
+      </details>
+    </div>
+  </article>
+
+  <!-- ADR 0014 -->
+  <article id="adr-0014" class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+    <header class="flex items-start justify-between gap-4 p-5 border-b border-slate-100">
+      <div>
+        <p class="text-xs text-slate-500">ADR 0014 · 2025-Q3</p>
+        <h3 class="text-lg font-semibold mt-0.5">Index pass on the orders table</h3>
+        <p class="text-sm text-slate-600 mt-1">200M-row orders 테이블에 partial index 3종 추가. customer history 800ms → 12ms, worker poll 2.5s → 40ms.</p>
+      </div>
+      <div class="text-right shrink-0">
+        <span class="pill bg-emerald-50 text-emerald-700 border border-emerald-200">Accepted</span>
+        <p class="text-xs text-slate-500 mt-2">P99 -98% (worker poll)</p>
+        <p class="text-xs text-slate-400">handoff: Priya</p>
+      </div>
+    </header>
+
+    <div class="p-5 grid md:grid-cols-2 gap-4 text-sm">
+      <details class="bg-slate-50 rounded p-3" open>
+        <summary class="cursor-pointer font-medium text-slate-700">Context</summary>
+        <p class="mt-2 text-slate-600">Orders 는 primary DB 읽기의 80%. EXPLAIN ANALYZE 가 200M row 테이블에서 seq scan 패턴 3종 노출: (customer_id, created_at DESC), (status, updated_at), external_ref lookup.</p>
+      </details>
+      <details class="bg-slate-50 rounded p-3" open>
+        <summary class="cursor-pointer font-medium text-slate-700">Decision</summary>
+        <ul class="mt-2 text-slate-600 list-disc pl-5 space-y-1">
+          <li><code>idx_orders_customer_created</code> partial (deleted_at IS NULL)</li>
+          <li><code>idx_orders_status_updated</code> partial (status IN ('pending','processing'))</li>
+          <li><code>idx_orders_external_ref</code> full</li>
+          <li><code>CONCURRENTLY</code> 빌드, 저트래픽 윈도우</li>
+        </ul>
+      </details>
+      <details class="bg-slate-50 rounded p-3">
+        <summary class="cursor-pointer font-medium text-slate-700">Consequences</summary>
+        <ul class="mt-2 text-slate-600 list-disc pl-5 space-y-1">
+          <li>Customer history 800ms → 12ms P99</li>
+          <li>Worker poll 2.5s → 40ms P99 (secondary alert 제거)</li>
+          <li>Insert ~8% 느려짐 (수용)</li>
+          <li>Disk +12GB (수용)</li>
+        </ul>
+      </details>
+      <details class="bg-slate-50 rounded p-3">
+        <summary class="cursor-pointer font-medium text-slate-700">Alternatives (기각)</summary>
+        <ul class="mt-2 text-slate-600 list-disc pl-5 space-y-1">
+          <li>Customer history MV — freshness 요구사항</li>
+          <li>status 분리 테이블 — invasive vs gain 비율 나쁨</li>
+        </ul>
+      </details>
+    </div>
+  </article>
+</section>
+
+<!-- Sources -->
+<section class="bg-white rounded-lg border border-slate-200 p-5 text-sm">
+  <h2 class="text-sm font-semibold text-slate-700 mb-3">소스 (실제 읽은 파일)</h2>
+  <div class="grid md:grid-cols-2 gap-x-6 gap-y-1 text-slate-600">
+    <p><span class="text-emerald-700">권위:</span> docs/adr/0008-caching-strategy.md</p>
+    <p><span class="text-emerald-700">권위:</span> docs/adr/0011-lazy-evaluation-cart-pricing.md</p>
+    <p><span class="text-emerald-700">권위:</span> docs/adr/0014-orders-table-index-pass.md</p>
+    <p><span class="text-slate-500">컨텍스트:</span> CONTEXT.md, CLAUDE.md, CHANGELOG.md</p>
+    <p><span class="text-slate-500">핸드오프:</span> docs/handoff/2025-{02,05,08}-*.md</p>
+    <p><span class="text-slate-500">씨앗 노트:</span> scratch/perf-notes.md</p>
+  </div>
+  <p class="text-xs text-slate-400 mt-3">기각 확인: experiments/2025/rust-rewrite-pricing.md, experiments/2025/cache-warmup-on-deploy.md, archive/legacy-2023/perf-2023-q4-postmortem.md (DEPRECATED).</p>
+</section>
+
+</main>
+
+<footer class="text-center text-xs text-slate-400 py-8">
+  Static HTML · file:// 친화 · Tailwind via CDN · 도구 호출 15회로 합성됨
+</footer>
+
+</body>
+</html>

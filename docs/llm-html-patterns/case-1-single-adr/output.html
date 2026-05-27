@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>ADR 0003: Zero Division Handling</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simpledotcss@2.2.0/simple.min.css">
+<style>
+  :root { --accent: #2563eb; --pos: #16a34a; --neg: #dc2626; --neu: #6b7280; --bg-soft: #f3f4f6; }
+  body { max-width: 920px; }
+  header { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; }
+  .badge-accepted { background: #dcfce7; color: #166534; }
+  .actions { margin-left: auto; display: flex; gap: 0.5rem; }
+  .actions button { padding: 0.4rem 0.9rem; font-size: 0.9rem; cursor: pointer; border: 1px solid #d1d5db; background: white; border-radius: 6px; }
+  .actions button:hover { background: var(--bg-soft); }
+  .actions button.ok { background: #dcfce7; border-color: #86efac; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+  .card { padding: 1rem 1.2rem; border-radius: 8px; border: 1px solid #e5e7eb; background: white; }
+  .card h3 { margin-top: 0; font-size: 1rem; }
+  .card.pos { border-left: 4px solid var(--pos); }
+  .card.neg { border-left: 4px solid var(--neg); }
+  .card ul { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+  .card li { margin: 0.3rem 0; }
+
+  .diff { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin: 1rem 0; }
+  .diff > div { padding: 1rem; font-family: ui-monospace, monospace; font-size: 0.85rem; }
+  .diff .before { background: #fef2f2; border-right: 1px solid #e5e7eb; }
+  .diff .after { background: #f0fdf4; }
+  .diff h4 { margin: 0 0 0.5rem; font-family: system-ui; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--neu); }
+  .diff pre { margin: 0; white-space: pre-wrap; }
+
+  .code-refs { margin: 1rem 0; }
+  .code-ref { border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 0.5rem; overflow: hidden; }
+  .code-ref-head { padding: 0.6rem 0.9rem; background: var(--bg-soft); cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+  .code-ref-head:hover { background: #e5e7eb; }
+  .code-ref-head code { font-size: 0.85rem; color: var(--accent); }
+  .code-ref-head .chevron { transition: transform 0.15s; }
+  .code-ref.open .chevron { transform: rotate(90deg); }
+  .code-ref-body { padding: 0.7rem 0.9rem; display: none; font-size: 0.9rem; color: #374151; border-top: 1px solid #e5e7eb; }
+  .code-ref.open .code-ref-body { display: block; }
+
+  details { margin: 0.5rem 0; }
+  details summary { cursor: pointer; font-weight: 600; padding: 0.4rem 0; }
+  .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #111827; color: white; padding: 0.6rem 1.2rem; border-radius: 6px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  pre code { font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 style="margin:0">ADR 0003</h1>
+    <p style="margin:0.2rem 0; color: var(--neu)">Zero Division Handling</p>
+  </div>
+  <span class="badge badge-accepted">Accepted - 2026-03-14</span>
+  <div class="actions">
+    <button id="btn-copy">Copy ADR</button>
+    <button id="btn-share">Share URL</button>
+  </div>
+</header>
+
+<hr>
+
+<h2>Context</h2>
+<p>계산기 프로젝트에서 0으로 나누기를 IEEE 754 기본 동작 (Infinity / NaN) 대신 어떻게 처리할지 결정. 회계/재무 용도라 조용한 잘못된 값 전파가 치명적. 사용자 인터뷰 (n=12) 중 8명이 "Infinity 표시는 버그로 인식".</p>
+
+<details>
+  <summary>대안 검토 (4개)</summary>
+  <ol>
+    <li><b>NaN 유지</b> — 호환성 최고, UX 최악</li>
+    <li><b>null 반환</b> — 타입 시그니처 오염</li>
+    <li><b>Result&lt;T,E&gt; 패턴</b> — JS 생태계 부적합</li>
+    <li><b>예외 throw</b> — 가장 명시적 (채택)</li>
+  </ol>
+</details>
+
+<h2>Decision</h2>
+<p><strong>NaN 반환 대신 <code>DivisionByZeroError</code> 예외를 던진다.</strong></p>
+
+<div class="diff">
+  <div class="before">
+    <h4>Before</h4>
+<pre>function divide(a, b) {
+  return a / b;
+  // 1/0 -> Infinity
+  // 0/0 -> NaN
+}</pre>
+  </div>
+  <div class="after">
+    <h4>After</h4>
+<pre>function divide(a, b) {
+  if (b === 0) {
+    throw new DivisionByZeroError(a, b);
+  }
+  return a / b;
+}</pre>
+  </div>
+</div>
+
+<h2>Consequences</h2>
+<div class="grid">
+  <div class="card pos">
+    <h3>Positive</h3>
+    <ul>
+      <li>사용자가 에러 명확히 인지 (Infinity 표시 사라짐)</li>
+      <li>try/catch 로 의도적 처리 가능</li>
+      <li>타입 안전 (정상 경로는 항상 number)</li>
+      <li>디버깅 정보 풍부 (피연산자 포함)</li>
+    </ul>
+  </div>
+  <div class="card neg">
+    <h3>Negative</h3>
+    <ul>
+      <li>기존 NaN 검사 코드 14곳 수정 필요</li>
+      <li>throw 비용 (벤치 &lt; 0.1ms, 무시 가능)</li>
+      <li>테스트 케이스 증가</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Affected Code</h2>
+<div class="code-refs">
+  <div class="code-ref">
+    <div class="code-ref-head"><code>src/parser/divide.ts:42-58</code><span class="chevron">&rsaquo;</span></div>
+    <div class="code-ref-body">핵심 변경. <code>b === 0</code> 가드 추가, NaN return 제거.</div>
+  </div>
+  <div class="code-ref">
+    <div class="code-ref-head"><code>src/error/types.ts</code> <em>(new)</em><span class="chevron">&rsaquo;</span></div>
+    <div class="code-ref-body">신규 <code>DivisionByZeroError</code> 클래스. <code>dividend</code>, <code>divisor</code> 필드 보관.</div>
+  </div>
+  <div class="code-ref">
+    <div class="code-ref-head"><code>src/ui/calculator-view.tsx:128</code><span class="chevron">&rsaquo;</span></div>
+    <div class="code-ref-body">try/catch 래핑, 에러 시 토스트 호출 ("0으로 나눌 수 없습니다").</div>
+  </div>
+  <div class="code-ref">
+    <div class="code-ref-head"><code>src/history/recorder.ts:67</code><span class="chevron">&rsaquo;</span></div>
+    <div class="code-ref-body">계산 히스토리에 에러 상태로 기록 (재실행 가능).</div>
+  </div>
+  <div class="code-ref">
+    <div class="code-ref-head"><code>tests/divide.test.ts</code> <em>(+4 cases)</em><span class="chevron">&rsaquo;</span></div>
+    <div class="code-ref-body">신규 테스트: 1/0, 0/0, -1/0, MAX_VALUE/0.</div>
+  </div>
+</div>
+
+<details>
+  <summary>Migration (4단계 PR 분할)</summary>
+  <ol>
+    <li>PR #234 — <code>DivisionByZeroError</code> 클래스만 머지</li>
+    <li>PR #235 — <code>divide.ts</code> + 호출처 14곳 (breaking)</li>
+    <li>PR #236 — UI 토스트 + 히스토리</li>
+    <li>PR #237 — NaN 검사 코드 cleanup (1주 모니터링 후)</li>
+  </ol>
+</details>
+
+<div class="toast" id="toast">복사됨</div>
+
+<script>
+  // Copy ADR (full markdown-ish text)
+  const adrText = `ADR 0003: Zero Division Handling [Accepted]
+
+Decision: NaN 반환 대신 DivisionByZeroError 예외 throw.
+
+Positive: 명확한 에러 인지, try/catch 가능, 타입 안전.
+Negative: 14곳 호출처 수정 필요, throw 비용 미미.
+
+Affected: src/parser/divide.ts:42-58, src/error/types.ts (new), src/ui/calculator-view.tsx:128, src/history/recorder.ts:67, tests/divide.test.ts (+4)`;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1500);
+  }
+
+  document.getElementById('btn-copy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(adrText); showToast('ADR 복사됨'); }
+    catch { showToast('복사 실패'); }
+  });
+
+  document.getElementById('btn-share').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(location.href); showToast('URL 복사됨'); }
+    catch { showToast('복사 실패'); }
+  });
+
+  // Toggle code-ref cards
+  document.querySelectorAll('.code-ref-head').forEach(h => {
+    h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+  });
+</script>
+
+</body>
+</html>
