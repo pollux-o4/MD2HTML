@@ -32,9 +32,15 @@ zero install / zero network / 인라인 only.
 ### 필드 2) Link code on GitHub
 
 ```
-권장: 없음. 또는 PRD 만 share (docs/md-show-me-prd.md).
-이유: 이 도구의 정체성 = prompt 자산 + 인터랙티브 HTML 큐레이션 레이어. 코드보다 prompt + 토큰이 디자인 시그널.
-시각 시그널은 §4 의 토큰 (색 / 타이포 / 베이스라인 4 패턴) 에서 더 강하다.
+https://github.com/pollux-o4/MD2HTML
+
+이 repo 안에서 특히 다음 파일을 참고:
+- docs/md-show-me-prd.md (PRD 21 결정 + 5 제약, 도구 본질)
+- docs/research/user-discovery/synthesis-final.md (사용자 페르소나 + 학술 종합)
+- docs/research/claude-design-input-final.md (이 문서, §2 필드 4 의 토큰 / 패턴 명세)
+- skills/show-me/SKILL.md (실제 도구 동작)
+
+코드 자체보다 위 문서들이 디자인 시그널 (정체성 / 사용자 / 톤) 강함.
 ```
 
 ### 필드 3) Add fonts, logos and assets
