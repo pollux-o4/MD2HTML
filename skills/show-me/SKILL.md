@@ -1,6 +1,6 @@
 ---
 name: show-me
-description: 사용자가 `/show-me <쿼리>` 로 부르면 repo 의 관련 Markdown 을 자동 큐레이션해서 질의 형태에 맞춘 인터랙티브 HTML 로 보여준다. M1 (discovery + head-preview agent loop) → M2 (인터랙티브 HTML 생성) → M3 (copy-as-prompt UX) → M5 (lazy stale check) 흐름. Markdown = source of truth, HTML = 사용자 대상 소비 레이어. 기본 zero install / zero network, CDN 라이브러리는 per-library confirm prompt 후 사용자 허용 시만. 사용 예: "/show-me 리뷰", "/show-me ADR 1~5 결정으로 코드 변한 곳".
+description: Turn a single /show-me query into a curated interactive HTML view of the Markdown in your repo. Use when the user runs /show-me, asks to "see" or "show" something from .md files, or wants an interactive report from existing notes/ADRs/handoffs.
 ---
 
 # show-me

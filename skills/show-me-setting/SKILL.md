@@ -1,6 +1,6 @@
 ---
 name: show-me-setting
-description: `/show-me` skill 의 초기 설정 1회용 명령. archive 경로 1개만 묻고 끝. 합리적 기본값 + 자유 입력 (Matt Pocock 스타일). 사용자가 명시 호출.
+description: One-time setup for the show-me skill. Asks a single question (archive path) and writes .show-me.toml. Use when the user runs /show-me-setting.
 ---
 
 # show-me-setting
