@@ -53,7 +53,8 @@ https://github.com/pollux-o4/MD2HTML
          -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
          (Pretendard 는 로컬 설치 시에만 사용, 외부 다운로드 0)
   mono = ui-monospace, SFMono-Regular, "SF Mono", Consolas, "D2Coding", monospace
-- 다크모드: `prefers-color-scheme: dark` 자동 감지만. 토글 UI 생략.
+- **라이트 모드가 디폴트** (Piepenbrock 2013 RCT: 정상 시력자 + 노인 둘 다 라이트 = visual acuity / proofreading 우위. 장시간 reading 정확도 ↑).
+- 다크는 `prefers-color-scheme: dark` 자동 감지 시에만 전환. 토글 UI 생략 (file:// 단일 HTML 환경에서 비용 큼).
 - 첨부 자료: 인라인용 토큰 셋 (§4 의 색 / 타이포 / spacing).
 ```
 
@@ -71,29 +72,29 @@ SaaS marketing 톤도, 학술 markdown 톤도, 터미널 dump 톤도 아니다.
 1순위 권장 = **안 2 (Warm Hybrid, 따뜻한 혼합)** — 5개 조사 중 4개와 호환. 학술·접근성·한국 문화 = 파랑 본문, dev tool·Claude.ai 차별화 = copper brand·hover·인용 띠.
 
 [안 1 — Cool Blue 단일 (차가운 파랑 단일, 안전·학술)]
-라이트: 배경 #FAFAF9 / 카드 #FFFFFF / 경계 #C7C6C2 / 본문 #1F1F1F / 보조 #6B6B6B
+**라이트 (디폴트)**: 배경 #FAFAF9 / 카드 #FFFFFF / 경계 #C7C6C2 / 본문 #1F1F1F / 보조 #6B6B6B
        강조 main #0969DA / 강조 sub #0550AE / 강조 연한 #DDF4FF
        success #1A7F37 / warning #9A6700 / danger #CF222E / info = 강조 main
-다크: 배경 #1A1A1A / 카드 #242424 / 경계 #3A3A3A / 본문 #E8E8E8 / 보조 #A0A0A0
+다크 (prefers-color-scheme: dark 시 자동 전환): 배경 #1A1A1A / 카드 #242424 / 경계 #3A3A3A / 본문 #E8E8E8 / 보조 #A0A0A0
      강조 main #4A9EFF / 강조 sub #2F7FD9 / 강조 연한 #1C3A5E
      success #3FB950 / warning #D29922 / danger #F85149
 트레이드오프: 안전·신뢰 최대. 차별화·Claude Code skill 정체성 약함.
 
 [안 2 — Warm Hybrid (따뜻한 혼합, 1순위 권장)]
-라이트: 배경 #F7F5F0 (따뜻한 무채색 약하게, warm-neutral) / 카드 #FDFCF8 / 경계 #C7C6C2 / 본문 #1F1F1F / 보조 #6B6B6B
+**라이트 (디폴트)**: 배경 #F7F5F0 (따뜻한 무채색 약하게, warm-neutral) / 카드 #FDFCF8 / 경계 #C7C6C2 / 본문 #1F1F1F / 보조 #6B6B6B
        본문 강조·링크·상태 = 파랑 #0969DA / 강조 sub #0550AE / 강조 연한 #DDF4FF
        brand·hover·인용 띠 (비텍스트만) = copper #C96442 / brand 텍스트용 보정 = #B5573A
        success #1A7F37 / warning #9A6700 / danger #CF222E
-다크: 배경 #1F1D1A / 카드 #2A2825 / 경계 #3D3A35 / 본문 #EDEAE3 / 보조 #A39E94
+다크 (prefers-color-scheme: dark 시 자동 전환): 배경 #1F1D1A / 카드 #2A2825 / 경계 #3D3A35 / 본문 #EDEAE3 / 보조 #A39E94
      강조 main #4A9EFF / brand 다크 #D97559 / brand 텍스트 다크 #E08866
      success #3FB950 / warning #D29922 / danger #F85149
 트레이드오프: 정체성·안전·차별화 셋 다 적당히. 토큰 2계열 관리 부담.
 
 [안 3 — Claude.ai 풀카피 (정체성 풀)]
-라이트: 배경 #F0ECE0 (크림) / 카드 #F7F4EA / 경계 #C7C6C2 / 본문 #1F1F1F / 보조 #6B6B6B
+**라이트 (디폴트)**: 배경 #F0ECE0 (크림) / 카드 #F7F4EA / 경계 #C7C6C2 / 본문 #1F1F1F / 보조 #6B6B6B
        강조 main (보정) #B5573A / 강조 sub #A84E33 / 강조 연한 #F4DDD0
        success #1A7F37 / warning #9A6700 / danger #CF222E / info #0969DA
-다크: 배경 #1F1D1A / 카드 #2A2825 / 경계 #3D3A35 / 본문 #EDEAE3 / 보조 #A39E94
+다크 (prefers-color-scheme: dark 시 자동 전환): 배경 #1F1D1A / 카드 #2A2825 / 경계 #3D3A35 / 본문 #EDEAE3 / 보조 #A39E94
      강조 main #E08866 / 강조 sub #D97559 / 강조 연한 #3A2620
 트레이드오프: Anthropic 정통성 최대. Claude.ai 클론처럼 보일 위험. 상태 색·brand 색 적록 색맹 충돌 (아이콘 의무 강함).
 
