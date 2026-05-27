@@ -3,7 +3,7 @@ id: md-show-me-prd
 type: prd
 status: skill-minimal
 language: ko
-updated: 2026-05-26
+updated: 2026-05-27
 labels:
   - ready-for-agent
   - skill-paradigm
@@ -17,12 +17,15 @@ source:
   - ui-patterns-catalog
   - persona-evaluation-nadia-park
   - thariq-html-effectiveness-license
+  - research/user-discovery/synthesis-final
+  - research/user-discovery/persona-h-leader-mode-vibe-coder
 ---
 
 # md-show-me PRD
 
 ## Changelog
 
+- **2026-05-27 (5차)** — 사용자 결정 4건 반영 (디자인 무관). (1) v1 primary 사용자 = 박서윤 (페르소나 H, 비CS 풀스택 학습자, 시각 학습자, AI 적극 활용) 으로 격상, 박지훈 (시니어 백엔드) 은 v1 secondary. 근거 = "도메인 지식 부족자도 큐레이션 결과로 의사결정 가능" 약속의 직접 검증자. (2) AI 답 톤 차단 5룰 (음차 무분별 금지, 어려운 한자어 금지, 번역체 종결어미 금지, em dash 단락당 1개 이내, 전문 용어 첫 등장 시 한글 풀이 의무) 을 M2 출력 본문 규칙으로 박음 — 색·폰트 같은 시각 결정과 독립이라 5차 정비에서 같이 처리. (3) 베스트셀러 4단계 흐름 (주의 끌기 → 소개 → 본문 → 적용) 을 view 기본 layout 으로 권장 — strict 강제 여부는 박서윤 dogfood 결과까지 보류. (4) "왜 우리 도구가 작동하는지" 의 학술 근거 사슬 (인지 → 기억 → 활용) 을 짧은 표로 박음 (Paivio / Sweller / Wittrock / Karpicke). 색 hex / 폰트 stack / 자세한 시각 결정은 Claude Design 결과 받고 별도 처리 (이 정비에서는 미포함).
 - **2026-05-26 (4차)** — `/grill-with-docs` 일대일 검토 정비. **M0 milestone → M1 흡수, M0 파일 archive.** profile.json cache 폐기. `unknown_markdowns` → M1 manifest top-level 필드. file_hash → mtime + size 휴리스틱. profile_hash / schema_version / match_strength 등급 / matched_fields / block_ids / abstract_source / excerpt 캐시 분기 / `external_sources` / `role_patterns` strict glob 표 / Conventional 경로 numbered list / `generated_markers` strict 키워드 list 모두 폐기. 41-패턴 strict 카탈로그 → 베이스라인 **3** strict (N1/N+5/N+4) + 선택 베이스라인 2 (N+1/N33, LLM 적합성 판단) + 추천 패턴 hint (즉석 생성 허용). M3 UI prescriptions (의견 버튼 / inline textarea / sessionStorage) 톤다운, LLM 자유. M4 contract (`anchor_status` enum found/weak/ambiguous/missing, `occurrence_index`, MD wire format) strict 유지. `major_headings` 유지 (M5 heading drift 감지). `.gitignore` 자동 처리 → confirm prompt y/n, 거부 시 알림만 + 다시 묻지 않음 (`gitignore_prompt_declined` 기록). `[Save]` → `_review/<slug>.md` block append (slug 당 1파일, dedup `source_path+anchor_quote+comment`, toast 누적 건수). slug 결정론적, history `_history/<ISO-timestamp>/` 누적, skill 은 auto-prune 안 함. M4 `surrounding_context` paragraph 규칙 폐기 (LLM 이 의미 단위 판단). Constraint #5 자동 모델 다운로드 opt-in 완전 폐기 (escape hatch 0).
 - **2026-05-26 (3차)** — skill 패러다임 first-principles 정비. LLM 이 자연스럽게 잘 하는 것 (Glob/Grep 판단, 후보 선별, 매칭 reasoning, cluster 판단) 은 PRD 에서 *명세 제거*. 우리가 진짜 더하는 것만 남김 — HTML 템플릿 라이브러리, 패턴 가이드, copy-as-prompt UX, 출력 컨벤션, Constraints. file_hash / profile_hash / schema_version / match_strength 등급 / abstract 캐시 / 41-패턴 strict 카탈로그 강제 등 script 도구 관성 제거.
 - **2026-05-26 (2차)** — over-engineering 정리 1차. BM25 + embedding 완전 제거, 자동 모델 다운로드 opt-in 제거, config split 폐기.
@@ -37,6 +40,57 @@ source:
 **문제 2 — 큰 Markdown repo 에서는 뭐가 진짜 관련 있는지 모른다.** 50개 `.md` 가 쌓인 repo 에서 한 줄 질문을 던졌을 때 "이 5개만 보면 됨" 을 짚어줄 도구가 없다. Thariq 식 "파일 명시 + HTML 만들어줘" 는 사용자가 이미 파일을 알 때만 통한다.
 
 우리 도구는 *질의 → discovery 자동 → 인터랙티브 HTML 큐레이션* 까지 한 번에 연결한다.
+
+## v1 사용자 정의
+
+5차 정비 (2026-05-27) 에서 user-discovery 종합 결과 (`docs/research/user-discovery/synthesis-final.md`) 를 받아 primary / secondary 를 다음과 같이 박는다. 자세한 페르소나는 같은 폴더의 페르소나 문서.
+
+| 우선순위 | 페르소나 | 한 줄 정체성 | 격상/배치 근거 |
+|---|---|---|---|
+| v1 primary | **박서윤** (페르소나 H) | 27세, 비CS 풀스택 학습자 (학부 생물학 → 부트캠프 + 풀스택 인턴), 시각 학습자, Claude Code / Obsidian / GitHub 적극 활용 | "도메인 지식 부족자도 큐레이션 결과로 의사결정 가능" 이라는 도구의 핵심 약속을 *직접 검증* 하는 사용자. dogfood 최단 loop (사용자 본인 정체성). |
+| v1 secondary | 박지훈 | 34세, KR 시니어 백엔드 (10년차) | 정보 밀도·신뢰성·인용 추적 같은 *전문가 상한선* 검증. 두 사람이 학습자 ↔ 전문가 양 끝을 잡아주면 가운데 페르소나는 자연스럽게 포함. |
+
+이 배치는 도구의 모든 design / UX 결정에서 우선 검증 대상이 박서윤이라는 뜻이다. *학습자가 끝까지 읽고 의사결정 가능한가* 가 1번 질문, *시니어가 정보 밀도에 만족하는가* 가 2번 질문.
+
+## 왜 작동하는가 — 인지-기억-활용 사슬 (학술 근거)
+
+도구의 모든 부위는 *학습자가 한 번에 인지하고 → 기억에 남기고 → 다음 작업에 활용* 하는 사슬 위에서 설계됐다. Markdown 만으로는 활용 단계가 무너진다 (사용자가 다시 안 봄). HTML 큐레이션이 그 빈 사슬을 메운다.
+
+| 도구 부위 | 학술 근거 | 한 줄 설명 |
+|---|---|---|
+| 시각 큐레이션 (인용 카드 + 원본 발췌 인접) | Paivio (1971) 이중 부호화 (dual coding, 글과 그림을 동시에 노출하면 기억이 두 번 박힘) | 같은 화면에 글과 시각 정보가 같이 있어야 학습자 기억에 강하게 남음. |
+| 적은 정보 + 정보 위계 시각화 | Sweller (1988) 인지 부하 이론 (cognitive load, 한 번에 처리 가능한 묶음 수의 상한) | 한 화면에 묶음 4±1개. 위계가 살아있으면 비CS 학습자도 머릿속 구조 (schema) 가 잡힘. |
+| `[Copy]` / `[Save]` / copy-as-prompt 행위 | Wittrock (1974) 생성적 학습 (generative learning, 사용자가 직접 만들어내는 행위가 학습을 강화) | 사용자가 다음 prompt 를 *직접 만드는* 행위로 학습이 깊어짐. 그냥 읽기보다 손이 움직임. |
+| 다시 호출 (`/show-me` 재실행) + 변경 안내 띠 | Karpicke (2008) 인출 연습 (retrieval practice, 기억에서 꺼내는 행위 자체가 가장 강한 학습) | 같은 주제를 다시 부를 때마다 기억에서 꺼내는 일 자체가 학습을 강화. |
+
+이 사슬은 design 결정의 *왜* 다. 베이스라인 3 (N1 / N+5 / N+4) 이 strict 인 이유, 카드 3~5개 권장, 모든 인터랙션에 `[Copy]` / `[Save]` 가 따라붙는 이유 모두 위 표로 환원된다.
+
+## 출력 본문 톤 차단 5룰 (M2 HTML 본문에 항상 적용)
+
+5차 정비에서 박서윤 페르소나의 명시 pain ("한글 사이 영어 단어 박혀 읽다 멈춤", "한자어 남발", "번역체") 을 받아, M2 가 만들어내는 HTML 본문에 다음 5룰을 *항상* 적용한다. 시각 디자인 (색·폰트) 과 독립이라 5차 정비에서 같이 박는다. SKILL.md 의 같은 룰과 일관.
+
+1. **영어 단어 음차 무분별 섞기 금지** — "baseline", "anti-pattern", "framework", "context", "trace" 같이 일반어로 대체 가능한 단어는 한글로 풀이 ("기본 패턴", "해서는 안 되는 것", "구조", "맥락", "추적"). 대체 불가 전문 용어만 원어 유지 + 한글 풀이 병기.
+2. **어려운 한자어 남발 금지** — "당사는", "본 도구는", "수행하다", "활용하다", "구현하다" → "저희가", "이 도구는", "한다", "쓴다", "만든다" 로 풀어 쓰기.
+3. **번역체 종결어미 금지** — "~에 의해", "~할 수 있습니다", "~되어집니다" 금지. "~할 수 있어요", "~돼요" 같은 자연스러운 한국어 어미.
+4. **em dash (—) 한 단락당 1개 이내** — 콤마·괄호로 대체 가능하면 대체. 2025년 AI 글 식별 신호 중 하나라 절제.
+5. **지식의 저주 (curse of knowledge) 차단 — 전문 용어 첫 등장 시 한글 풀이 의무** — 도메인 약어, 3글자 이하 영문, 학습자가 모를 단어는 첫 등장 시 괄호 안 또는 hover 풀이 1줄. 같은 페이지 안에서 재등장 시 풀이 생략 (반복 정보가 인지 부하를 늘림).
+
+근거 — `docs/research/user-discovery/synthesis-final.md` §12 의 anti-pattern 룰, `academic-communication-korean.md`, 토스 라이팅 가이드, Pinker (2014) *curse of knowledge*.
+
+## v1 view 기본 layout — 베스트셀러 4단계 흐름 (권장)
+
+박서윤 페르소나가 "베스트셀러 책 톤" 을 ideal 로 짚었고, Gawande / Gladwell / 김상욱 / 정재승 같은 popular science 저자들이 공통으로 따르는 4단계 흐름이 도구의 view 기본형으로 자연스럽다.
+
+```
+1. 주의 끌기 (lead)       ← 한 줄 결론 또는 도발적 질문 (첫 viewport)
+2. 소개 (premise)         ← 이 답이 왜 필요한지 1~2문장 (맥락 다리)
+3. 본문 (worked example)  ← 인용 카드 3~5개 (베이스라인 1, Cowan 4±1)
+4. 적용 (transfer)        ← copy-as-prompt + 다음 질문 chip (베이스라인 N+4)
+```
+
+베이스라인 1 (citation 답변 카드) 과 베이스라인 N+4 (copy-as-prompt) 가 본문·적용 단계와 직접 정렬되므로 *추가 비용 거의 없음*. 단지 layout 의 기본 순서를 박는 것.
+
+**사용자 결정 보류** — 이 4단계를 strict 강제로 박을지, 짧은 lookup 질의에는 생략하게 LLM 적합성 판단으로 둘지는 **박서윤 dogfood 결과 받고 결정**. 5차 정비에서는 권장으로만 표시.
 
 ## Solution
 
@@ -93,7 +147,7 @@ source:
 
 - **베이스라인 3 (strict, 모든 호출에 포함)** — citation 답변 카드 (N1), source-of-truth back-link 배지 (N+5), copy-as-prompt 오버레이 (N+4)
 - **선택 베이스라인 (LLM 적합성 판단)** — discovery transparency 패널 (N+1, 첫 사용 / 결과 의심 시 가치 ↑), 원문 주석 (N33, 본문 review 흐름일 때 가치 ↑)
-- **P0 (M2 v1)** — vault 그래프, backlinks, 갤러리, 표, 비교, 타임라인, spec 차트, tabbed
+- **P0 (M2 v1)** — vault 그래프, backlinks, 갤러리, 표, 비교, 타임라인, spec 차트, 탭 전환 (tabbed)
 - **P1 후속** — diff, kanban, 슬라이드, status, PR writeup, flowchart, wizard, manifest diff viewer (N+2), unknown markdowns triage (N+3), lazy stale banner (N+6), query refinement chips (N+7)
 - **P2 / P3** — 도메인 특화 (v2)
 
@@ -151,6 +205,9 @@ override 가 필요한 경우만 repo root 에 `.show-me.toml` 하나. 기본 gi
 | D11 | zero install / zero network | survived |
 | D12 | 41 패턴 라이브러리 (LLM hint) | modified (strict 카탈로그 → 가이드) |
 | D13 | CDN 라이브러리 = per-library confirm prompt + `enable_cdn_libs[]` 리스트 (spec viz 만이 아니라 *모든* CDN 자산에 일반화) | modified (단일 flag → 리스트) |
+| D14 | v1 primary = 박서윤 (페르소나 H, 비CS 풀스택 학습자, 시각 학습자, AI 적극 활용), v1 secondary = 박지훈 (시니어 백엔드) | new (5차) |
+| D15 | M2 HTML 본문에 톤 차단 5룰 항상 적용 (음차 무분별 / 한자어 / 번역체 / em dash / 지식의 저주) | new (5차) |
+| D16 | View 기본 layout = 베스트셀러 4단계 흐름 (주의 끌기 → 소개 → 본문 → 적용). strict vs 옵션 여부는 박서윤 dogfood 결과까지 보류 | new (5차, 사용자 결정 대기) |
 
 **삭제된 over-engineering**: `project-profile.json` cache 파일 (+ M0 milestone 흡수), `file_hash` (→ mtime+size), `profile_hash`, `schema_version`, `match_strength` 등급, `matched_fields`, `abstract_source`, `excerpt` 캐시 분기, `block_ids` 필드, `external_sources` 필드, `role_patterns` strict glob 표, Conventional 경로 numbered list, `generated_markers` strict 키워드 list, 41 패턴 strict 카탈로그 강제, config split, 자동 모델 다운로드 opt-in, M3 UI prescriptions (의견 버튼 / textarea / sessionStorage), M4 `surrounding_context` paragraph 규칙.
 
@@ -178,6 +235,7 @@ Tool-native 패턴 4개 (discovery transparency N+1, manifest diff viewer N+2, u
 - **dirty repo**: frontmatter 없는 노트, handoff, generated snapshot, Windows 경로, 중복 anchor, unknown `.md` 모두에서 동작.
 - **Apply Review (M4) wire format**: MD 출력. `anchor_status` enum (found / weak / ambiguous / missing) + `occurrence_index` 상태별 처리.
 - **stale 감지**: mtime / size 변경 후 호출에서 자동 banner. `major_headings` 변경 시 M5 heading drift 감지.
+- **본문 톤 차단 5룰 (D15)**: M2 HTML 본문 표본 검사 — em dash 단락당 1개 이내, 첫 등장 전문 용어에 한글 풀이 동반, 음차 무분별·번역체 종결어미 부재. 학습자 페르소나 (박서윤) 가 *멈춤 없이* 끝까지 읽는지 dogfood 로 확인.
 
 ## Out of Scope
 

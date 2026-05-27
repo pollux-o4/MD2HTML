@@ -66,23 +66,45 @@ Linear 의 절제 + Vercel Geist 의 절제 + GitHub Primer 의 information dens
 v1 primary 사용자 (비CS 풀스택 학습자, 박서윤) 는 *"노트 읽으러 온 상태"* 다.
 SaaS marketing 톤도, 학술 markdown 톤도, 터미널 dump 톤도 아니다.
 
-[색 — 인라인 토큰, 학술 + 시장 종합]
-배경 #FAFAF9 (off-white, warm 극미. Piepenbrock 2013 positive polarity 우위) / 카드 #FFFFFF / 경계 #E5E5E3
-본문 #1A1A1A (순흑 회피, halation 완화) / 보조 #6B6A67 (WCAG AA 4.8:1 통과)
-상태색: success #1A7F37 / warning #9A6700 / danger #D1242F (Mehta & Zhu: 빨강 = 회피·정밀, 경고 정합)
+[색 — 5개 조사 종합 결과. 3가지 안 + 1순위 권장]
+조사 5종: 학술 (Mehta & Zhu 2009 RCT 등) + dev tool 시장 (Linear/Geist/Primer/Cursor/Claude.ai) + 8색 심리·장시간 시청 (60-30-10 무채색 기반 + cool accent) + 학습·노트·AI 도구 15개 벤치마크 (Obsidian/Notion/Bear/ChatGPT/Claude.ai/Perplexity 등) + 접근성 (WCAG + 색맹 + 한국 문화)
+1순위 권장 = **안 2 (Warm Hybrid, 따뜻한 혼합)** — 5개 조사 중 4개와 호환. 학술·접근성·한국 문화 = 파랑 본문, dev tool·Claude.ai 차별화 = copper brand·hover·인용 띠.
 
-[강조색 — 두 후보 다 살림. Claude Design 대화 중 사용자가 최종 선택]
-후보 A — 파랑 #0969da (학술 권장. Mehta & Zhu 2009 Science RCT: 파랑 = 탐색·창의 정합. md-show-me 는 탐색·학습 도구. 단 Primer 와 같은 색 → 차별성 약함)
-후보 B — copper #C96442 (시장 권장. Anthropic 톤 연결 + Linear/Primer 와 차별. 단 학술 권장 위배)
-역할 분리 안 — 본문 강조·링크 = 파랑, brand·hover·citation 띠 = copper (둘 다 활용 가능)
-강조 연한 — 후보 A 면 #E7F1FB, 후보 B 면 #F5E6DF (citation 카드 배경, 배지 muted)
-*시각 학습자가 primary 이므로 색은 시각 위계의 핵심 역할.* 텍스트 강조용 색 사용은 자제, 위계 / 카테고리 구분에만.
+[안 1 — Cool Blue 단일 (차가운 파랑 단일, 안전·학술)]
+라이트: 배경 #FAFAF9 / 카드 #FFFFFF / 경계 #C7C6C2 / 본문 #1F1F1F / 보조 #6B6B6B
+       강조 main #0969DA / 강조 sub #0550AE / 강조 연한 #DDF4FF
+       success #1A7F37 / warning #9A6700 / danger #CF222E / info = 강조 main
+다크: 배경 #1A1A1A / 카드 #242424 / 경계 #3A3A3A / 본문 #E8E8E8 / 보조 #A0A0A0
+     강조 main #4A9EFF / 강조 sub #2F7FD9 / 강조 연한 #1C3A5E
+     success #3FB950 / warning #D29922 / danger #F85149
+트레이드오프: 안전·신뢰 최대. 차별화·Claude Code skill 정체성 약함.
 
-[다크모드 토큰 — prefers-color-scheme: dark 자동 감지, 라이트와 warm 일관성 유지]
-배경 #0F0F0E (warm near-black, 라이트 #FAFAF9 와 톤 일관) / 카드 #1A1A18 / 경계 #2E2D2A
-본문 #ECEAE5 / 보조 #8E8C86
-강조 다크 — 후보 A: #4493F8 (라이트 파랑 채도·명도 ↑) / 후보 B: #C96442 그대로 (copper 는 라이트·다크 동일 가능)
-상태 다크: success #3FB950 / warning #D29922 / danger #F85149
+[안 2 — Warm Hybrid (따뜻한 혼합, 1순위 권장)]
+라이트: 배경 #F7F5F0 (따뜻한 무채색 약하게, warm-neutral) / 카드 #FDFCF8 / 경계 #C7C6C2 / 본문 #1F1F1F / 보조 #6B6B6B
+       본문 강조·링크·상태 = 파랑 #0969DA / 강조 sub #0550AE / 강조 연한 #DDF4FF
+       brand·hover·인용 띠 (비텍스트만) = copper #C96442 / brand 텍스트용 보정 = #B5573A
+       success #1A7F37 / warning #9A6700 / danger #CF222E
+다크: 배경 #1F1D1A / 카드 #2A2825 / 경계 #3D3A35 / 본문 #EDEAE3 / 보조 #A39E94
+     강조 main #4A9EFF / brand 다크 #D97559 / brand 텍스트 다크 #E08866
+     success #3FB950 / warning #D29922 / danger #F85149
+트레이드오프: 정체성·안전·차별화 셋 다 적당히. 토큰 2계열 관리 부담.
+
+[안 3 — Claude.ai 풀카피 (정체성 풀)]
+라이트: 배경 #F0ECE0 (크림) / 카드 #F7F4EA / 경계 #C7C6C2 / 본문 #1F1F1F / 보조 #6B6B6B
+       강조 main (보정) #B5573A / 강조 sub #A84E33 / 강조 연한 #F4DDD0
+       success #1A7F37 / warning #9A6700 / danger #CF222E / info #0969DA
+다크: 배경 #1F1D1A / 카드 #2A2825 / 경계 #3D3A35 / 본문 #EDEAE3 / 보조 #A39E94
+     강조 main #E08866 / 강조 sub #D97559 / 강조 연한 #3A2620
+트레이드오프: Anthropic 정통성 최대. Claude.ai 클론처럼 보일 위험. 상태 색·brand 색 적록 색맹 충돌 (아이콘 의무 강함).
+
+[모든 안 공통 의무]
+- 상태 색은 *항상 아이콘 동반* (success ✓ / warning △ / danger ✕) — 색맹 (적록 한국 남성 5%) 안전성 확보. 한국 접근성 지침 KWCAG 2.2 5.3.1 도 동일 요구.
+- 강조 링크는 밑줄, 위험 버튼은 굵은 외곽선.
+- *시각 학습자가 primary 이므로 색은 시각 위계 핵심 역할.* 텍스트 강조용 색 사용 자제, 위계·카테고리 구분에만.
+
+[사용자가 진짜 결정할 분기점 2개]
+1. Anthropic 정통성 vs 차별화·자체 정체성 — Claude Code skill 임을 색으로 즉시 알아봐야 하나? Yes → 안 3, No → 안 2 또는 1.
+2. (안 2 선택 시) 배경 따뜻함 강도 — `#F7F5F0` (살짝 크림, Claude.ai 와 구분) vs `#F0ECE0` (Claude.ai 정통).
 
 [타이포 — 한/영 혼용]
 sans = "Pretendard Variable", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", -apple-system, system
