@@ -76,6 +76,9 @@ slug = 쿼리에서 url-safe slugify (예: `"리뷰 정리"` → `리뷰-정리`
 - `n5-back-link-badge.html` — 각 인용 옆 원본 .md 링크 (Windows 경로 `/` 로 통일)
 - `n4-copy-as-prompt.html` — 모든 인터랙션 옆 `[Copy]` / `[Save]` 오버레이
 
+**Layout 패턴 차용 — Tariq 20 demo 매핑**:
+쿼리 형태에 맞는 layout 은 `assets/tariq-patterns.md` 의 20-demo × 쿼리 매핑 표에서 1개 또는 여러 개 골라서 차용. 원본 HTML 자체는 vendoring 안 하고 *패턴만* 차용해서 우리 inline HTML/CSS 로 재구현. 사용자 환경에 `external/html-effectiveness/` 가 clone 되어 있으면 시각 reference 로 활용 가능. 출처: Tariq Shihipar `html-effectiveness` (Apache 2.0, © 2026 Anthropic PBC).
+
 **선택 베이스라인** (LLM 적합성 판단):
 - N+1 discovery transparency 패널 — 첫 사용 / dirty repo 결과 의심 시 가치 ↑
 - N33 원문 주석 레이어 — 본문 review 흐름일 때 가치 ↑
